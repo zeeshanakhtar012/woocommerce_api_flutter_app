@@ -1,10 +1,8 @@
-import 'dart:ui';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class AppColors {
-  static Color buttonColor = Color(0xff000000);
+  static Color buttonColor = Color(0xff002654);
   static Color whiteColor = Color(0xffF4F4F4);
   static BoxShadow boxShadow = BoxShadow(
     color: Colors.black.withOpacity(.12),

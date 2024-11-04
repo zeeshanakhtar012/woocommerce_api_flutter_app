@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:zrj/constants/colors.dart';
 import 'package:zrj/views/screens/authentication_screens/screen_email.dart';
 import 'package:zrj/views/screens/authentication_screens/screen_signup.dart';
 import '../../../constants/fonts.dart';
@@ -48,7 +49,7 @@ class ScreenLogin extends StatelessWidget {
       width: Get.width,
       padding: EdgeInsets.symmetric(vertical: 22.h),
       decoration: BoxDecoration(
-        color: Colors.black,
+        color: AppColors.buttonColor,
         borderRadius: BorderRadius.only(
           bottomRight: Radius.circular(30),
           bottomLeft: Radius.circular(30),
@@ -72,15 +73,15 @@ class ScreenLogin extends StatelessWidget {
                 child: InkWell(
                   onTap: () => Get.to(ScreenSignUp()),
                   child: Text(
-                    "SIGN UP",
+                    'login_sign_up'.tr, // Use translation key here
                     style: AppFontsStyle.loginOption,
                   ),
                 ),
               ).marginOnly(bottom: 48.h),
-              Text("Sign in", style: AppFontsStyle.logInTitle)
+              Text('login_title'.tr, style: AppFontsStyle.logInTitle) // Use translation key
                   .marginOnly(bottom: 11.h),
               Text(
-                "Access your account to start shopping and\nmanage your orders.",
+                'login_subtitle'.tr, // Use translation key
                 textAlign: TextAlign.start,
                 style: AppFontsStyle.logInSubtitle.copyWith(
                   color: Colors.white,
@@ -100,34 +101,24 @@ class ScreenLogin extends StatelessWidget {
     return Column(
       children: [
         MyCostomTexttField(
-          hint: "Email",
+          hint: 'login_email_hint'.tr, // Use translation key
           validator: FormValidator.validateEmail,
         ).marginOnly(bottom: 10.h),
         MyCostomTexttField(
-          hint: "Password",
+          hint: 'login_password_hint'.tr, // Use translation key
           isPasswordField: true,
           validator: FormValidator.validatePassword,
-          // onChanged: (value) {
-          //   // Add your password change logic here
-          //   // e.g., if invalid, update passwordError.value
-          //   if (value.isEmpty) {
-          //     passwordError.value = "Password cannot be empty";
-          //   } else {
-          //     passwordError.value = ""; // Clear the error
-          //   }
-          // },
         ),
-         Text(
-            passwordError.value,
-            style: TextStyle(color: Colors.red),
-          ),
-        
+        Text(
+          passwordError.value,
+          style: TextStyle(color: Colors.red),
+        ),
         Align(
           alignment: Alignment.centerRight,
           child: InkWell(
             onTap: () => Get.to(ScreenEmail()),
             child: Text(
-              "Forgot Password?",
+              'login_forgot_password'.tr, // Use translation key
               style: TextStyle(color: Color(0xFFE41A4A), fontSize: 12.sp),
             ),
           ),
@@ -144,9 +135,9 @@ class ScreenLogin extends StatelessWidget {
         // }
         Get.to(HomeScreen());
       },
-      text: "SIGN IN",
+      text: 'login_sign_in'.tr, // Use translation key
       textColor: Colors.white,
-      buttonColor: Colors.black,
+      buttonColor: AppColors.buttonColor,
       loading: false, // Update with actual loading state
     ).marginSymmetric(horizontal: 32.w, vertical: 70.h);
   }

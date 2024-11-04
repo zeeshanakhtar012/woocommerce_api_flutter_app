@@ -26,7 +26,7 @@ class ScreenProductSubcategory extends StatelessWidget {
           onTap: () => Get.back(),
           child: CircleAvatar(
             radius: 10.r,
-            backgroundColor: Color(0xff4C6042),
+            backgroundColor: Colors.red,
             child: Icon(Icons.arrow_back, color: Colors.white),
           ).marginSymmetric(horizontal: 10.sp, vertical: 10.sp),
         ),

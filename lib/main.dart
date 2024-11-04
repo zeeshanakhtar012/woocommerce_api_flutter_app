@@ -1,18 +1,20 @@
-// ignore_for_file: unused_import
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:get/get_navigation/src/root/get_material_app.dart';
-import 'package:get/get_navigation/src/routes/transitions_type.dart';
+import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:zrj/utils/app_translation.dart';
 import 'package:zrj/views/screens/splash_screen.dart';
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await GetStorage.init(); // Initialize GetStorage for language persistence
+
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
+
   runApp(const MyApp());
 }
 
@@ -24,8 +26,13 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  final box = GetStorage(); // Initialize GetStorage instance
+
   @override
   Widget build(BuildContext context) {
+    // Retrieve the saved language or default to 'en_US'
+    String locale = box.read('language') ?? 'en_US';
+
     return ResponsiveSizer(
       builder: (context, orientation, screenType) {
         return ScreenUtilInit(
@@ -36,7 +43,7 @@ class _MyAppState extends State<MyApp> {
             final ThemeData lightTheme = ThemeData(
               useMaterial3: false,
               fontFamily: 'Avenir',
-              appBarTheme: AppBarTheme(
+              appBarTheme: const AppBarTheme(
                 backgroundColor: Colors.white,
               ),
               brightness: Brightness.light,
@@ -46,15 +53,18 @@ class _MyAppState extends State<MyApp> {
 
             return GetMaterialApp(
               debugShowCheckedModeBanner: false,
+              translations: AppTranslations(), // Translation setup
+              locale: Locale(locale.split('_')[0], locale.split('_')[1]), // Load saved locale
+              fallbackLocale: const Locale('en', 'US'),
               theme: lightTheme,
-              home: SplashScreen(),
+              home: SplashScreen(), // Starting screen (SplashScreen can navigate to LanguageSelectionScreen)
               defaultTransition: Transition.fadeIn,
-              transitionDuration: Duration(milliseconds: 500),
+              transitionDuration: const Duration(milliseconds: 500),
               builder: (context, child) {
                 final mediaQueryData = MediaQuery.of(context);
                 final scale = mediaQueryData.textScaleFactor.clamp(0.8, 0.9);
                 return MediaQuery(
-                  data: MediaQuery.of(context).copyWith(textScaleFactor: scale),
+                  data: mediaQueryData.copyWith(textScaleFactor: scale),
                   child: child!,
                 );
               },

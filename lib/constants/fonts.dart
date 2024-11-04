@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
@@ -94,7 +93,7 @@ class AppFontsStyle {
         margin: EdgeInsets.all(8.sp),
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          color: Color(0xff002654),
+          color: Colors.red,
         ),
         child: SvgPicture.asset("assets/icons/back-button.svg"),
       ),

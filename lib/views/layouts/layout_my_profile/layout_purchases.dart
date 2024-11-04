@@ -60,7 +60,7 @@ class _LayoutPurchasesState extends State<LayoutPurchases> {
           onTap: () => Navigator.pop(context),
           child: CircleAvatar(
             radius: 10.r,
-            backgroundColor: Color(0xff4C6042),
+            backgroundColor: Colors.red,
             child: Icon(
               Icons.arrow_back,
               color: Colors.white,

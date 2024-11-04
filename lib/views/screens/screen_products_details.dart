@@ -5,11 +5,13 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:zrj/constants/colors.dart';
+import 'package:zrj/widgets/rating_indicator.dart';
 
 import '../home/home_layouts/layout_cart.dart';
 
 class ScreenProductDetails extends StatefulWidget {
   final String productName;
+  final String productImage;
   final String productPrice; // Ensure this is a clean numeric string
   final List<String> sizes;
   final List<String> colors;
@@ -17,6 +19,7 @@ class ScreenProductDetails extends StatefulWidget {
   ScreenProductDetails({
     required this.productName,
     required this.productPrice,
+    required this.productImage,
     required this.sizes,
     required this.colors,
   });
@@ -75,7 +78,7 @@ class _ScreenProductDetailsState extends State<ScreenProductDetails> {
             onTap: ()=>Get.to(() => LayoutCart(isHome: true,)),
             child: CircleAvatar(
               radius: 25.r,
-              backgroundColor: Color(0xff4C6042),
+              backgroundColor: AppColors.buttonColor,
               child: SvgPicture.asset("assets/icons/icon_store.svg"),
             ).marginSymmetric(horizontal: 10.sp),
           ),
@@ -86,11 +89,18 @@ class _ScreenProductDetailsState extends State<ScreenProductDetails> {
           child: Column(
             children: [
               Container(
+                margin: EdgeInsets.symmetric(
+                  vertical: 8.sp,
+                ),
                 height: 300,
-                color: Colors.grey[300], // Placeholder for image
+                width: double.infinity,
+                color: Colors.white,
+                child: ClipRRect(
+                    borderRadius: BorderRadius.circular(25),
+                    child: Image.network(widget.productImage)),
               ),
               Container(
-                padding: EdgeInsets.symmetric(horizontal: 32.w, vertical: 10.h),
+                padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 10.h),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.only(
@@ -106,16 +116,22 @@ class _ScreenProductDetailsState extends State<ScreenProductDetails> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     SizedBox(height: 10),
-                    Text(widget.productName,
-                        style: TextStyle(
-                            fontSize: 18.sp,
-                            fontWeight: FontWeight.w400,
-                            color: Colors.black)),
-                    Text('\$${getTotalPrice()}',
-                        style: TextStyle(
-                            fontSize: 30.sp,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.black)),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(widget.productName,
+                            style: TextStyle(
+                                fontSize: 18.sp,
+                                fontWeight: FontWeight.w400,
+                                color: Colors.black)),
+                        Text('\$${getTotalPrice()}',
+                            style: TextStyle(
+                                fontSize: 30.sp,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.black)),
+                      ],
+                    ),
+                    TRatingBarIndicator(rating: 3.6),
                     SizedBox(
                         height: 40.sp,
                         child: Row(
@@ -226,7 +242,7 @@ class _ScreenProductDetailsState extends State<ScreenProductDetails> {
                             color: Colors.black,
                             fontWeight: FontWeight.w600,
                             fontSize: 14.sp)),
-                    Text("Product description goes here.",
+                    Text("Product description goes here.The user interface of the app is quite intvitive. I was able to navigate and make purchases seamlessly. Great job!",
                         style: TextStyle(
                             color: Colors.black,
                             fontWeight: FontWeight.w300,
@@ -246,7 +262,7 @@ class _ScreenProductDetailsState extends State<ScreenProductDetails> {
           },
           child: Text('Add to Cart'),
           style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.black,
+            backgroundColor: AppColors.buttonColor,
             padding: EdgeInsets.symmetric(vertical: 15),
           ),
         ),

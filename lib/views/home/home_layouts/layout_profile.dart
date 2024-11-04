@@ -10,13 +10,14 @@ import '../../layouts/layout_cart_tabs/screen_favourite_product.dart';
 import '../../layouts/layout_my_profile/layout_my_account.dart';
 import '../../layouts/layout_my_profile/layout_my_address.dart';
 import '../../layouts/layout_my_profile/layout_purchases.dart';
+import '../../screens/language_selection_screen.dart';
 
 // Profile Controller
 class ProfileController extends GetxController {
   var userName = "No User".obs;
   var userEmail = "anonymous@example.com".obs;
 
-  // Add methods to update user details as needed
+// Add methods to update user details as needed
 }
 
 // Profile Layout
@@ -94,30 +95,30 @@ class LayoutProfile extends StatelessWidget {
                           ],
                         ),
                       ),
-                      
-                       Column(
-                          children: [
-                            Text(
-                              controller.userName.value,
-                              style: AppFontsStyle.profileName,
-                            ).marginOnly(bottom: 5.h, top: 8.h),
-                            Text(
-                              controller.userEmail.value,
-                              style: AppFontsStyle.profileEmail,
-                            ).marginOnly(bottom: 5.h),
-                          ],
-                        ),
-                      
+
+                      Column(
+                        children: [
+                          Text(
+                            controller.userName.value,
+                            style: AppFontsStyle.profileName,
+                          ).marginOnly(bottom: 5.h, top: 8.h),
+                          Text(
+                            controller.userEmail.value,
+                            style: AppFontsStyle.profileEmail,
+                          ).marginOnly(bottom: 5.h),
+                        ],
+                      ),
+
                       ItemProfile(
                         backgroundColor: Colors.white,
-                        title: 'My Account',
+                        title: 'my_account'.tr,  // Use translation key
                         imageUrl: "assets/icons/profile-icon.svg",
                         onTap: () {
                           Get.to(LayoutMyAccount());
                         },
                       ),
                       ItemProfile(
-                        title: 'My Address',
+                        title: 'my_address'.tr,  // Use translation key
                         backgroundColor: Colors.white,
                         imageUrl: "assets/icons/Location_Icon.svg",
                         onTap: () {
@@ -126,7 +127,7 @@ class LayoutProfile extends StatelessWidget {
                       ),
                       ItemProfile(
                         backgroundColor: Colors.white,
-                        title: 'My Purchases',
+                        title: 'my_purchases'.tr,  // Use translation key
                         imageUrl: "assets/icons/order.svg",
                         onTap: () {
                           Get.to(LayoutPurchases());
@@ -134,7 +135,7 @@ class LayoutProfile extends StatelessWidget {
                       ),
                       ItemProfile(
                         backgroundColor: Colors.white,
-                        title: 'My Favourites',
+                        title: 'my_favourites'.tr,  // Use translation key
                         imageUrl: "assets/icons/fav.svg",
                         onTap: () {
                           Get.to(ScreenFavouriteProduct());
@@ -142,22 +143,22 @@ class LayoutProfile extends StatelessWidget {
                       ),
                       ItemProfile(
                         backgroundColor: Colors.white,
-                        title: 'Logout',
+                        title: 'logout'.tr,  // Use translation key
                         imageUrl: "assets/icons/logout.svg",
                         onTap: () async {
                           Get.defaultDialog(
                             backgroundColor: Colors.white,
-                            title: "Alert",
+                            title: "alert".tr,  // Use translation key
                             confirmTextColor: Colors.white,
-                            middleText: "Are you sure you\nwant to logout?",
+                            middleText: "are_you_sure_logout".tr,  // Use translation key
                             confirm: TextButton(
                               onPressed: () {
                                 // Logout logic here
                               },
                               child: Text(
-                                "Proceed",
+                                "proceed".tr,  // Use translation key
                                 style:
-                                    TextStyle(color: AppColors.appPrimaryColor),
+                                TextStyle(color: AppColors.appPrimaryColor),
                               ),
                             ),
                             cancel: ElevatedButton(
@@ -168,7 +169,7 @@ class LayoutProfile extends StatelessWidget {
                                 backgroundColor: AppColors.appPrimaryColor,
                               ),
                               child: Text(
-                                "Cancel",
+                                "cancel".tr,  // Use translation key
                                 style: TextStyle(color: Colors.white),
                               ),
                             ),
@@ -178,11 +179,10 @@ class LayoutProfile extends StatelessWidget {
                       ItemProfile(
                         isLanguage: true,
                         backgroundColor: Color(0xff002654,),
-                        title: 'Change Language',
+                        title: 'change_language'.tr,  // Use translation key
                         imageUrl: "assets/icons/icon_fee_svg.svg",
                         onTap: () {
-                          // controller.loadUserData();
-                          // Get.to(LayoutPayment());
+                          Get.to(() => LanguageSelectionScreen());
                         },
                       ),
                       SizedBox(height: 60.h),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
+import 'package:zrj/constants/colors.dart';
 
 class ScreenEmail extends StatelessWidget {
   ScreenEmail({super.key});
@@ -22,7 +23,7 @@ class ScreenEmail extends StatelessWidget {
                 width: double.infinity,
                 padding: EdgeInsets.only(right: 22.w, bottom: 22.h, top: 8.h),
                 decoration: BoxDecoration(
-                  color: Colors.black,
+                  color: AppColors.buttonColor,
                   borderRadius: BorderRadius.only(
                     bottomRight: Radius.circular(30),
                     bottomLeft: Radius.circular(30),
@@ -49,7 +50,7 @@ class ScreenEmail extends StatelessWidget {
                           icon: SvgPicture.asset("assets/icons/back-button.svg"),
                         ).marginOnly(bottom: 48.h),
                         Text(
-                          "Enter your email",
+                          "enter_your_email".tr,  // Use translation key
                           style: TextStyle(
                             fontSize: 24.sp,
                             fontWeight: FontWeight.bold,
@@ -57,7 +58,7 @@ class ScreenEmail extends StatelessWidget {
                           ),
                         ).marginOnly(bottom: 11.h),
                         Text(
-                          "Please provide your email address to\nproceed.",
+                          "provide_email_address".tr,  // Use translation key
                           textAlign: TextAlign.start,
                           style: TextStyle(
                             color: Colors.white,
@@ -79,7 +80,7 @@ class ScreenEmail extends StatelessWidget {
                       padding: EdgeInsets.symmetric(horizontal: 32.w),
                       child: TextFormField(
                         decoration: InputDecoration(
-                          hintText: "Your email address",
+                          hintText: "your_email_address".tr,  // Use translation key
                           filled: true,
                           fillColor: Colors.grey[200],
                           border: OutlineInputBorder(
@@ -89,7 +90,7 @@ class ScreenEmail extends StatelessWidget {
                         ),
                         validator: (value) {
                           if (value == null || !RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
-                            return 'Please enter a valid email';
+                            return 'please_enter_valid_email'.tr;  // Use translation key
                           }
                           return null;
                         },
@@ -105,11 +106,11 @@ class ScreenEmail extends StatelessWidget {
                             }
                           },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.black,
+                            backgroundColor: AppColors.buttonColor,
                             padding: EdgeInsets.symmetric(horizontal: 32.w, vertical: 12.h),
                           ),
                           child: Text(
-                            "Send Code",
+                            "send_code".tr,  // Use translation key
                             style: TextStyle(color: Colors.white),
                           ),
                         ),

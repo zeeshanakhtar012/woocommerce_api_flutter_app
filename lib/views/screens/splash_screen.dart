@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:zrj/constants/colors.dart';
-import 'package:zrj/views/screens/screen_test.dart';
+import 'package:zrj/views/screens/language_selection_screen.dart';
 import '../home/home_screen.dart';
 import 'intro_screen.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -26,7 +26,8 @@ class _SplashScreenState extends State<SplashScreen> {
     if (token != null && token.isNotEmpty) {
       Get.offAll(HomeScreen());
     } else {
-      Get.offAll(IntroScreen());
+      Get.offAll(LanguageSelectionScreen());
+      Get.off(IntroScreen());
     }
   }
 

@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
+import 'package:zrj/constants/colors.dart';
 
 import '../../../widgets/custom_field_search.dart';
 import 'layout_cart.dart';
 
 class CustomProduct {
   final String name;
+
   final String imagePath;
   final String price;
   final String color;
@@ -15,6 +17,7 @@ class CustomProduct {
 
   CustomProduct({
     required this.name,
+
     required this.imagePath,
     required this.price,
     required this.color,
@@ -66,6 +69,7 @@ class DressItemCard extends StatelessWidget {
                   ),
                 ),
               ),
+
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
                 child: Text(
@@ -164,7 +168,7 @@ class _LayoutSearchState extends State<LayoutSearch> {
                 top: 0,
                 left: 0,
                 child: RefreshIndicator(
-                  color: Colors.green, // Change this to your primary color
+                  color: Colors.red, // Change this to your primary color
                   onRefresh: () async {
                     return await Future.delayed(Duration(seconds: 2));
                   },
@@ -173,14 +177,14 @@ class _LayoutSearchState extends State<LayoutSearch> {
                       Row(
                         children: [
                           CustomTextFieldSearch(
-                            width: Get.width * .65,
+                            width: Get.width/1.35,
                             hintText: 'Search',
                             suffixIcon: Container(
                               height: 20.h,
                               width: 65.w,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(50),
-                                color: Color(0xff4C6042),
+                                color: AppColors.buttonColor,
                               ),
                               child: Icon(
                                 Icons.search,
@@ -194,12 +198,12 @@ class _LayoutSearchState extends State<LayoutSearch> {
                             },
                             child: CircleAvatar(
                               radius: 23.r,
-                              backgroundColor: Color(0xff4C6042),
+                              backgroundColor:AppColors.buttonColor,
                               child: SvgPicture.asset("assets/icons/icon_store.svg"),
                             ),
                           ),
                         ],
-                      ).marginOnly(top: 10.sp,),
+                      ),
                       Row(
                         children: [
                           Text(
@@ -211,7 +215,7 @@ class _LayoutSearchState extends State<LayoutSearch> {
                             ),
                           ),
                         ],
-                      ).marginOnly(top: 10.sp,),
+                      ).paddingOnly(top: 10,left: 10),
                       Expanded(
                         child: GridView.builder(
                           padding: EdgeInsets.only(top: 20.h, bottom: 60.h),
@@ -230,7 +234,7 @@ class _LayoutSearchState extends State<LayoutSearch> {
                         ),
                       ),
                     ],
-                  ).marginSymmetric(horizontal: 30.w),
+                  ).marginSymmetric(horizontal: 10.w),
                 ),
               ),
             ],

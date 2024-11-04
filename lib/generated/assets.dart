@@ -64,7 +64,7 @@ class Assets {
   static const String imagesDiscount = 'assets/images/discount.png';
   static const String imagesDressPng = 'assets/images/dress_png.png';
   static const String imagesEmptyCart = 'assets/images/empty_cart.png';
-  static const String imagesFinal  ZRJ = 'assets/images/final  ZRJ.png';
+  static const String imagesFinal = 'assets/images/final  ZRJ.png';
   static const String imagesGalaxyWatch41 = 'assets/images/galaxy_watch_4_1.png';
   static const String imagesGalaxyWatch42 = 'assets/images/galaxy_watch_4_2.png';
   static const String imagesGalaxyWatch43 = 'assets/images/galaxy_watch_4_3.png';

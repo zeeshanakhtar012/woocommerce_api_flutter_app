@@ -2,6 +2,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:zrj/constants/colors.dart';
 
 import '../../../constants/fonts.dart';
 import '../../../widgets/custom_button.dart';
@@ -20,7 +21,7 @@ class LayoutAddress extends StatelessWidget {
             onTap: () => Get.back(),
             child: CircleAvatar(
               radius: 10.r,
-              backgroundColor: Color(0xff4C6042),
+              backgroundColor: Colors.red,
               child: Icon(Icons.arrow_back, color: Colors.white,),
             ).marginSymmetric(
               horizontal: 10.sp,
@@ -68,7 +69,7 @@ class LayoutAddress extends StatelessWidget {
                 },
                 text: "ADD ADDRESS",
                 textColor: Colors.white,
-                buttonColor: Colors.black,
+                buttonColor: AppColors.buttonColor,
               ).marginOnly(
                 top: 20.sp,
               )

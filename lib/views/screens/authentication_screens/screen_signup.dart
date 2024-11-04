@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:zrj/constants/colors.dart';
 import '../../../constants/fonts.dart';
 import '../../../utils/form_valid.dart';
 import '../../../widgets/custom_button.dart';
@@ -60,7 +61,7 @@ class ScreenSignUp extends StatelessWidget {
       width: Get.width,
       padding: EdgeInsets.symmetric(vertical: 22.h),
       decoration: BoxDecoration(
-        color: Colors.black,
+        color: AppColors.buttonColor,
         borderRadius: BorderRadius.only(
           bottomRight: Radius.circular(30),
           bottomLeft: Radius.circular(30),
@@ -86,17 +87,17 @@ class ScreenSignUp extends StatelessWidget {
                     Get.back();
                   },
                   child: Text(
-                    "SIGN IN",
+                    'signup_signin_text'.tr, // Use translation key here
                     style: AppFontsStyle.loginOption,
                   ),
                 ),
               ).marginOnly(bottom: 48.h),
               Text(
-                "Sign Up",
+                'signup_title'.tr, // Use translation key here
                 style: AppFontsStyle.logInTitle,
               ).marginOnly(bottom: 11.h),
               Text(
-                "Join us today and enjoy a personalized shopping \nexperience.",
+                'signup_subtitle'.tr, // Use translation key here
                 textAlign: TextAlign.start,
                 style: AppFontsStyle.logInSubtitle.copyWith(
                     color: Colors.white,
@@ -115,29 +116,29 @@ class ScreenSignUp extends StatelessWidget {
     return Column(
       children: [
         MyCostomTexttField(
-          hint: "Your First Name",
+          hint: 'signup_first_name_hint'.tr, // Use translation key here
           validator: FormValidator.validateName,
         ).marginOnly(bottom: 10.h),
         MyInputField(
-          hint: "Your Last Name",
+          hint: 'signup_last_name_hint'.tr, // Use translation key here
           validator: FormValidator.validateName,
         ).marginOnly(bottom: 10.h),
         MyInputField(
-          hint: "Your User Name",
+          hint: 'signup_username_hint'.tr, // Use translation key here
           validator: FormValidator.validateUserName,
         ).marginOnly(bottom: 10.h),
         MyInputField(
-          hint: "Your Email",
+          hint: 'signup_email_hint'.tr, // Use translation key here
           validator: FormValidator.validateEmail,
         ).marginOnly(bottom: 10.h),
         MyInputField(
           isPasswordField: true,
-          hint: "Your Password",
+          hint: 'signup_password_hint'.tr, // Use translation key here
           validator: FormValidator.validatePassword,
         ).marginOnly(bottom: 10.h),
         MyInputField(
           isPasswordField: true,
-          hint: "Confirm Password",
+          hint: 'signup_confirm_password_hint'.tr, // Use translation key here
           validator: (value) {
             // Add your validation logic here
           },
@@ -152,12 +153,12 @@ class ScreenSignUp extends StatelessWidget {
         if (_formKey.currentState?.validate() ?? false) {
           Get.to(HomeScreen());
         } else {
-          _showQuickAlert("Please fill out all fields correctly.");
+          _showQuickAlert('signup_alert'.tr); // Use translation key here
         }
       },
-      text: "SIGN UP",
+      text: 'signup_button_text'.tr, // Use translation key here
       textColor: Colors.white,
-      buttonColor: Colors.black,
+      buttonColor: AppColors.buttonColor,
     ).marginOnly(left: 32.w, right: 32.w, top: 20.sp, bottom: 34.h);
   }
 }

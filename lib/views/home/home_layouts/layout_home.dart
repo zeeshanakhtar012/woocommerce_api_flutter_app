@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
@@ -74,7 +76,7 @@ class LayoutHome extends StatelessWidget {
                         width: 70,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(50),
-                          color: Color(0xff4C6042),
+                          color: AppColors.buttonColor,
                         ),
                         child: Icon(
                           Icons.search,
@@ -90,13 +92,13 @@ class LayoutHome extends StatelessWidget {
                       },
                       child: CircleAvatar(
                         radius: 23.r,
-                        backgroundColor: Color(0xff4C6042),
+                        backgroundColor: AppColors.buttonColor,
                         child: SvgPicture.asset("assets/icons/icon_store.svg"),
                       ).marginOnly(left: 5.w),
                     ),
                   ],
-                ),
-                buildTitle("Products").marginOnly(top: 10.h, left: 30.w),
+                ).marginSymmetric(horizontal: 10),
+                buildTitle("Products").marginOnly(top: 10.h, left: 25.w),
                 sampleProducts.isEmpty
                     ? buildSkeletonList()
                     : CustomListviewBuilder(
@@ -105,6 +107,7 @@ class LayoutHome extends StatelessWidget {
                         itemBuilder: (context, index) {
                           return GestureDetector(
                             onTap: () {
+                              log("iage path = ${sampleProducts[index].imageUrl}");
                               Get.to(() => ScreenProductDetails(
                                     productName: sampleProducts[index].name,
                                     productPrice:
@@ -114,15 +117,15 @@ class LayoutHome extends StatelessWidget {
                                       'Red',
                                       'Blue',
                                       'Green'
-                                    ], // Example colors
+                                    ], productImage: sampleProducts[index].imageUrl, // Example colors
                                   ));
                             },
                             child: buildProductItem(sampleProducts[index])
-                                .marginOnly(left: index == 0 ? 30.w : 10.w),
+                                .marginOnly(left: index == 0 ? 20.w : 10.w),
                           );
                         },
                       ),
-                buildTitle("Sale Discount").marginOnly(top: 10.h, left: 30.w),
+                buildTitle("Sale Discount").marginOnly(top: 10.h, left: 25.w),
                 sampleSalesDiscount.isEmpty
                     ? buildSkeletonList()
                     : Column(

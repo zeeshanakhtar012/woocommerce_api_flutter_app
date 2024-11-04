@@ -7,7 +7,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../../constants/fonts.dart';
 import '../../../utils/form_valid.dart';
 import '../../../widgets/custom_button.dart';
-import '../../../widgets/custom_input_field.dart';
 import '../../../widgets/my_costom_textt_field.dart';
 import '../screen_test.dart';
 
@@ -17,7 +16,7 @@ class ScreenSetNewPassword extends StatelessWidget {
   final _formKey = GlobalKey<FormState>();
 
   @override
-  Widget build(BuildContext context) { 
+  Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: SafeArea(
@@ -41,7 +40,6 @@ class ScreenSetNewPassword extends StatelessWidget {
                     Positioned(
                         right: -250,
                         top: 10.h,
-                        // bottom: 120.h,
                         child: AnimatedSvg(
                           svgAssetPath: "assets/icons/spiral.svg",
                           color: Colors.white.withOpacity(0.2),
@@ -55,14 +53,14 @@ class ScreenSetNewPassword extends StatelessWidget {
                             Get.back();
                           },
                           icon:
-                              SvgPicture.asset("assets/icons/back-button.svg"),
+                          SvgPicture.asset("assets/icons/back-button.svg"),
                         ).marginOnly(bottom: 48.h),
                         Text(
-                          "Set new password",
+                          "set_new_password".tr, // Use translation key
                           style: AppFontsStyle.logInTitle,
                         ).marginOnly(bottom: 11.h),
                         Text(
-                          "Create a strong password to secure \nyour account",
+                          "create_strong_password".tr, // Use translation key
                           textAlign: TextAlign.start,
                           style: AppFontsStyle.logInSubtitle.copyWith(
                               color: Colors.white,
@@ -79,25 +77,15 @@ class ScreenSetNewPassword extends StatelessWidget {
               ),
               Column(
                 children: [
-                  // Obx(() {
-                  //   return MyInputField(
-                  //     controller: updatePassword.oldPassword.value,
-                  //     isPasswordField: true,
-                  //     hint: "Enter old password",
-                  //   );
-                  // }),
-                 
-                      MyCostomTexttField( 
-                      isPasswordField: true,
-                      hint: "Enter new password",
-                      validator: FormValidator.validatePassword,
-                    ),
-               
-                    MyCostomTexttField( 
-                      isPasswordField: true,
-                      hint: "Confirm new password",
-                       
-                    ) ,
+                  MyCostomTexttField(
+                    isPasswordField: true,
+                    hint: "enter_new_password".tr, // Use translation key
+                    validator: FormValidator.validatePassword,
+                  ),
+                  MyCostomTexttField(
+                    isPasswordField: true,
+                    hint: "confirm_new_password".tr, // Use translation key
+                  ),
                 ],
               ).marginSymmetric(
                 vertical: 30.h,
@@ -105,16 +93,13 @@ class ScreenSetNewPassword extends StatelessWidget {
               ),
               Spacer(),
               CustomButton(
-                 
                 onTap: () async {
                   SharedPreferences prefs =
-                      await SharedPreferences.getInstance();
+                  await SharedPreferences.getInstance();
                   String? token = prefs.getString('access_token');
                   print('Retrieved Token: $token');
-            
-                   
                 },
-                text: "SAVE PASSWORD",
+                text: "save_password".tr, // Use translation key
                 textColor: Colors.white,
                 buttonColor: Colors.black,
               ).marginOnly(

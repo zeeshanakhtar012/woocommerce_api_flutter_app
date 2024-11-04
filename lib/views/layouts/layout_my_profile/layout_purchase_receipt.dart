@@ -102,30 +102,32 @@ class _LayoutPurchaseReceiptState extends State<LayoutPurchaseReceipt> {
         centerTitle: true,
       ),
       body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              margin: EdgeInsets.symmetric(vertical: 20.h),
-              padding: EdgeInsets.symmetric(horizontal: 29.w, vertical: 12.h),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(15.r),
-                boxShadow: [AppColors.myCustomBoxShadow],
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                margin: EdgeInsets.symmetric(vertical: 20.h),
+                padding: EdgeInsets.symmetric(horizontal: 29.w, vertical: 12.h),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(15.r),
+                  boxShadow: [AppColors.myCustomBoxShadow],
+                ),
+                child: isLoadingSingle
+                    ? CustomListviewBuilder(
+                        scrollDirection: CustomDirection.vertical,
+                        itemCount: 6,
+                        itemBuilder: (context, index) {
+                          return CartSkeleton(height: 200);
+                        },
+                      )
+                    : singleOrderList.isNotEmpty
+                        ? buildReceiptDetails(singleOrderList[0])
+                        : Text("No order found."),
               ),
-              child: isLoadingSingle
-                  ? CustomListviewBuilder(
-                      scrollDirection: CustomDirection.vertical,
-                      itemCount: 6,
-                      itemBuilder: (context, index) {
-                        return CartSkeleton(height: 200);
-                      },
-                    )
-                  : singleOrderList.isNotEmpty
-                      ? buildReceiptDetails(singleOrderList[0])
-                      : Text("No order found."),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

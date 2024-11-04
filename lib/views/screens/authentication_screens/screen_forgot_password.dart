@@ -6,6 +6,7 @@ import '../../../constants/colors.dart';
 import '../../../constants/fonts.dart';
 import '../../../widgets/custom_button.dart';
 import '../../../widgets/custom_package/pin_put.dart';
+
 class ScreenForgotPassword extends StatelessWidget {
   final String email;
   final bool isSignUp;
@@ -18,7 +19,6 @@ class ScreenForgotPassword extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: SafeArea(
@@ -62,13 +62,13 @@ class ScreenForgotPassword extends StatelessWidget {
                 icon: SvgPicture.asset("assets/icons/back-button.svg"),
               ).marginOnly(bottom: 48.h),
               Text(
-                isSignUp ? "Verify your email" : "Forgot password",
+                isSignUp ? "verify_your_email".tr : "forgot_password".tr,
                 style: AppFontsStyle.logInTitle,
               ).marginOnly(bottom: 11.h),
               Text(
                 isSignUp
-                    ? "Please check your email for the OTP"
-                    : "Don’t worry, we’ll help you reset it \nin no time.",
+                    ? "please_check_your_email_for_otp".tr
+                    : "dont_worry_we_will_help_you_reset_it".tr,
                 textAlign: TextAlign.start,
                 style: AppFontsStyle.logInSubtitle.copyWith(color: Colors.white, height: 2.5),
               ).marginOnly(bottom: 2.h),
@@ -85,16 +85,15 @@ class ScreenForgotPassword extends StatelessWidget {
       children: [
         Spacer(flex: 1),
         Center(
-          child:  PinPut(
-              controller: TextEditingController(),
-              textStyle: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w600, color: Color(0xff4C6042)),
-              followingFieldDecoration: _fieldDecoration(),
-              eachFieldHeight: 63.h,
-              eachFieldWidth: 63.w,
-              separator: SizedBox(width: 16.w),
-              fieldsCount: 4,
-            ),
-          
+          child: PinPut(
+            controller: TextEditingController(),
+            textStyle: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w600, color: Color(0xff4C6042)),
+            followingFieldDecoration: _fieldDecoration(),
+            eachFieldHeight: 63.h,
+            eachFieldWidth: 63.w,
+            separator: SizedBox(width: 16.w),
+            fieldsCount: 4,
+          ),
         ),
         Spacer(flex: 2),
         _buildEmailInfo(),
@@ -102,7 +101,7 @@ class ScreenForgotPassword extends StatelessWidget {
         _buildExpiryInfo(),
         Spacer(flex: 1),
         _buildActionButtons(),
-      ].marginSymmetric(vertical: 30.h, horizontal: 32.w),
+      ],
     );
   }
 
@@ -116,7 +115,7 @@ class ScreenForgotPassword extends StatelessWidget {
   Widget _buildEmailInfo() {
     return Column(
       children: [
-        Text("Code was sent to your email", style: AppFontsStyle.forgotFonts),
+        Text("code_was_sent_to_your_email".tr, style: AppFontsStyle.forgotFonts),
         Text(
           email,
           style: AppFontsStyle.forgotFontsDark.copyWith(color: AppColors.appPrimaryColor),
@@ -128,11 +127,11 @@ class ScreenForgotPassword extends StatelessWidget {
   Widget _buildExpiryInfo() {
     return RichText(
       text: TextSpan(
-        text: "This code will expire in",
+        text: "this_code_will_expire_in".tr,
         style: AppFontsStyle.forgotFonts,
         children: [
           TextSpan(
-            text: " 5 minutes",
+            text: "five_minutes".tr,
             style: TextStyle(color: AppColors.appPrimaryColor, fontWeight: FontWeight.w400, fontSize: 14.sp),
           ),
         ],
@@ -143,26 +142,21 @@ class ScreenForgotPassword extends StatelessWidget {
   Widget _buildActionButtons() {
     return Column(
       children: [
-         CustomButton(
-            // loading: controllerVerifyOtp.isLoading.value,
-            // onTap: () => controllerVerifyOtp.verifyOtp(isSignUp, email),
-            text: "VERIFY CODE",
-            textColor: Colors.white,
-            buttonColor: Colors.black,
-          ),
-        
+        CustomButton(
+          // loading: controllerVerifyOtp.isLoading.value,
+          // onTap: () => controllerVerifyOtp.verifyOtp(isSignUp, email),
+          text: "verify_code".tr,  // Use translation key
+          textColor: Colors.white,
+          buttonColor: Colors.black,
+        ),
         CustomButton(
           // loading: controllerVerifyOtp.resendLoading.value,
           // onTap: () => controllerVerifyOtp.resendOTP(email),
-          text: "RESEND CODE",
+          text: "resend_code".tr,  // Use translation key
           textColor: Colors.white,
           buttonColor: AppColors.appGreyColor,
         ).marginOnly(top: 10.sp),
       ],
     );
   }
-}
-
-extension on List<Widget> {
-  marginSymmetric({required double vertical, required double horizontal}) {}
 }

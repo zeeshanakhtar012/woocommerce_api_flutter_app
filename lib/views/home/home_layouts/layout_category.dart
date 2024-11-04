@@ -1,10 +1,9 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
 import '../../../constants/colors.dart';
 import '../../../constants/fonts.dart';
-import '../../../widgets/custom_listview_builder.dart';
-import '../../items/item_layout_category/item_layout_category/item_layout_category.dart';
-import '../../screens/screen_product_subcategory.dart';
 
 class LayoutCategory extends StatelessWidget {
   @override
@@ -20,28 +19,39 @@ class LayoutCategory extends StatelessWidget {
         ),
         centerTitle: true,
       ),
-      body: CustomListviewBuilder(
-        scrollDirection: CustomDirection.vertical,
-        itemCount: 10,
-        itemBuilder: (context, index) {
-          return ItemLayoutCategory(
-            dressName: "Category $index", // Placeholder name
-            dressImageUrl: 'https://images.unsplash.com/photo-1651047566242-1f93897b907a?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-            onTap: () {
-              // Navigation logic can be added here
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ScreenProductSubcategory(
-                    categoryID: index, // Placeholder category ID
-                    categoryName: "Category $index", // Placeholder name
-                  ),
-                ),
-              );
-            },
-          );
-        },
+      body: Column(
+        children: [
+          CustomImageCard(imagePath: 'assets/images/Product_1.png', title: 'Summer Specials', onTap: () {  },),
+          CustomImageCard(imagePath: 'assets/images/Product_1.png', title: 'Spring Collection', onTap: () {  },),
+          CustomImageCard(imagePath: 'assets/images/Product_1.png', title: 'Winter Collection', onTap: () {  },),
+          CustomImageCard(imagePath: 'assets/images/Product_1.png', title: 'Wedding Collection', onTap: () {  },),
+        ],
       ),
     );
   }
 }
+
+class CustomImageCard extends StatelessWidget {
+  const CustomImageCard({
+    super.key, required this.imagePath, required this.title, required this.onTap,
+  });
+  final String imagePath;
+  final String title;
+  final VoidCallback onTap;
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        height: Get.height/7,
+        decoration: BoxDecoration(
+          image: DecorationImage(image: AssetImage(imagePath)),
+        ),
+        child: Center(
+          child: Text(title,style: TextStyle(fontSize: 25,fontWeight: FontWeight.bold,color: Colors.white),),
+        ),
+      ),
+    );
+  }
+}
+

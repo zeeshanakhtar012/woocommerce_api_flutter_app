@@ -68,7 +68,7 @@ class LayoutMyAccount extends StatelessWidget {
       onTap: () => Get.back(),
       child: CircleAvatar(
         radius: 10.r,
-        backgroundColor: Color(0xff4C6042),
+        backgroundColor: Colors.red,
         child: Icon(Icons.arrow_back, color: Colors.white),
       ).marginSymmetric(horizontal: 10.sp, vertical: 10.sp),
     );
@@ -98,7 +98,7 @@ class LayoutMyAccount extends StatelessWidget {
             builder: (context, child) {
               return Theme(
                 data: Theme.of(context).copyWith(
-                  colorScheme: ColorScheme.light(primary: Color(0xff4C6042)),
+                  colorScheme: ColorScheme.light(primary: AppColors.buttonColor),
                   textButtonTheme: TextButtonThemeData(
                       style:
                           TextButton.styleFrom(foregroundColor: Colors.black)),
@@ -113,7 +113,7 @@ class LayoutMyAccount extends StatelessWidget {
           );
           // Handle date selection
         },
-        icon: Icon(CupertinoIcons.calendar, color: Color(0xff4C6042)),
+        icon: Icon(CupertinoIcons.calendar, color: AppColors.buttonColor),
       ),
       hint: 'Date of birth',
       readOnly: true,
@@ -208,7 +208,7 @@ class LayoutMyAccount extends StatelessWidget {
       },
       text: "UPDATE DETAILS",
       textColor: Colors.white,
-      buttonColor: Colors.black,
+      buttonColor: AppColors.buttonColor,
     ).marginSymmetric(vertical: 8.sp);
   }
 }

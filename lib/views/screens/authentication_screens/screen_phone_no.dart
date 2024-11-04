@@ -1,8 +1,6 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 
 import '../../../constants/fonts.dart';
 import '../../../widgets/custom_button.dart';
@@ -19,7 +17,6 @@ class ScreenPhone extends StatelessWidget {
         child: Column(
           children: [
             Container(
-              // height: height * 0.35,
               decoration: BoxDecoration(
                 image: DecorationImage(
                   alignment: Alignment.centerRight,
@@ -58,11 +55,11 @@ class ScreenPhone extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "Enter your phone",
+                          "enter_your_phone".tr, // Use translation key
                           style: AppFontsStyle.logInTitle,
                         ),
                         Text(
-                          "Enter your phone number to verify\nyour account.",
+                          "enter_your_phone_number_to_verify".tr, // Use translation key
                           textAlign: TextAlign.start,
                           style: AppFontsStyle.logInSubtitle,
                         ).marginSymmetric(vertical: 10.sp),
@@ -81,7 +78,7 @@ class ScreenPhone extends StatelessWidget {
                 horizontal: 15.w,
               ),
               child: MyInputField(
-                hint: "Enter phone number",
+                hint: "enter_phone_number".tr, // Use translation key
               ),
             ),
             Spacer(),
@@ -92,7 +89,7 @@ class ScreenPhone extends StatelessWidget {
               ),
               child: CustomButton(
                 onTap: () {},
-                text: "SAVE PHONE NUMBER",
+                text: "save_phone_number".tr, // Use translation key
                 textColor: Colors.white,
                 buttonColor: Colors.black,
               ),
