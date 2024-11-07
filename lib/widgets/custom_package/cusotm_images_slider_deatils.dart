@@ -1,5 +1,5 @@
+
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -41,8 +41,6 @@ class _SlidingImageContainerState extends State<SlidingImageContainer> {
     return IntrinsicHeight(
       child: Container(
         color: Colors.white,
-        // height: 392.h,
-        // height: double.infinity,
         width: width,
         child: Stack(
           children: [
@@ -51,40 +49,28 @@ class _SlidingImageContainerState extends State<SlidingImageContainer> {
                 controller: _pageController,
                 itemCount: widget.product.images!.length,
                 itemBuilder: (context, index) {
-                  List<String> imageUrl =
-                      widget.product.images!.map((e) => e.imagePath!).toList();
+                  final imageUrl = widget.product.images[index].src;
                   return Container(
-                    // color: Color(0xFF00033d),
                     child: Center(
                       child: CachedNetworkImage(
-                        imageUrl: imageUrl[index],
+                        imageUrl: imageUrl,
                         fit: BoxFit.cover,
                         height: double.infinity,
-                        // width: double.infinity,
-
                         placeholder: (context, url) => ImageSkeleton(
                           height: Get.height / 2 + 50,
                           width: width,
                         ),
+                        errorWidget: (context, url, error) => Center(
+                          child: Text(
+                            'No Image Available',
+                            style: TextStyle(
+                              fontSize: 18.sp,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.grey,
+                            ),
+                          ),
+                        ),
                       ),
-
-                      //  Image.network(
-                      //   errorBuilder: (context, error, stackTrace) {
-                      //     return Center(
-                      //       child: Text(
-                      //         'No Images',
-                      //         style: TextStyle(
-                      //           fontSize: 18.sp,
-                      //           fontWeight: FontWeight.bold,
-                      //           color: Colors.grey,
-                      //         ),
-                      //       ),
-                      //     );
-                      //   },
-                      //   height: height.h,
-                      //   imageUrl[index],
-                      //   fit: BoxFit.fill,
-                      // ),
                     ),
                   );
                 },
@@ -94,7 +80,7 @@ class _SlidingImageContainerState extends State<SlidingImageContainer> {
               bottom: 10.h,
               right: 15.w,
               child: CustomContainer(
-                productId: '1',
+                productId: widget.product.id.toString(), // Example of setting productId dynamically
                 isInWishlist: true,
                 onToggleWishlist: (String) {},
               ),
@@ -107,7 +93,7 @@ class _SlidingImageContainerState extends State<SlidingImageContainer> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: List.generate(
                     widget.product.images!.length,
-                    (index) => Container(
+                        (index) => Container(
                       margin: EdgeInsets.symmetric(horizontal: 4.sp),
                       width: 8.sp,
                       height: 8.sp,

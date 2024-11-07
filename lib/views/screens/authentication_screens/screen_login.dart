@@ -6,6 +6,7 @@ import 'package:zrj/constants/colors.dart';
 import 'package:zrj/views/screens/authentication_screens/screen_email.dart';
 import 'package:zrj/views/screens/authentication_screens/screen_signup.dart';
 import '../../../constants/fonts.dart';
+import '../../../controllers/controller_authentication.dart';
 import '../../../utils/form_valid.dart';
 import '../../../widgets/custom_button.dart';
 import '../../../widgets/my_costom_textt_field.dart';
@@ -17,6 +18,7 @@ class ScreenLogin extends StatelessWidget {
 
   final _formKey = GlobalKey<FormState>();
   final passwordError = "".obs;
+  ControllerAuthentication controller = Get.put(ControllerAuthentication());
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +26,6 @@ class ScreenLogin extends StatelessWidget {
       statusBarColor: Colors.black,
       statusBarBrightness: Brightness.light,
     ));
-
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: SafeArea(
@@ -45,7 +46,7 @@ class ScreenLogin extends StatelessWidget {
 
   Widget _buildHeader() {
     return Container(
-      height: 226.h,
+      // height: 226.h,
       width: Get.width,
       padding: EdgeInsets.symmetric(vertical: 22.h),
       decoration: BoxDecoration(
@@ -101,10 +102,12 @@ class ScreenLogin extends StatelessWidget {
     return Column(
       children: [
         MyCostomTexttField(
-          hint: 'login_email_hint'.tr, // Use translation key
-          validator: FormValidator.validateEmail,
+          controller:controller.userName.value,
+          hint: 'User Name'.tr, // Use translation key
+          // validator: FormValidator.validateEmail,
         ).marginOnly(bottom: 10.h),
         MyCostomTexttField(
+          controller:controller.password.value,
           hint: 'login_password_hint'.tr, // Use translation key
           isPasswordField: true,
           validator: FormValidator.validatePassword,
@@ -129,16 +132,16 @@ class ScreenLogin extends StatelessWidget {
 
   Widget _buildSignInButton() {
     return CustomButton(
+      // loading: controller.isLoading.value,
       onTap: () async {
-        // if (_formKey.currentState?.validate() ?? false) {
-        //   Get.to(HomeScreen());
-        // }
-        Get.to(HomeScreen());
+        if (_formKey.currentState?.validate() ?? false) {
+          controller.signInUser();
+        }
+
       },
       text: 'login_sign_in'.tr, // Use translation key
       textColor: Colors.white,
       buttonColor: AppColors.buttonColor,
-      loading: false, // Update with actual loading state
     ).marginSymmetric(horizontal: 32.w, vertical: 70.h);
   }
 }

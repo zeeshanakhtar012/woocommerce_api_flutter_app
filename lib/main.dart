@@ -8,13 +8,11 @@ import 'package:zrj/utils/app_translation.dart';
 import 'package:zrj/views/screens/splash_screen.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await GetStorage.init(); // Initialize GetStorage for language persistence
-
+  await GetStorage.init();
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
-
   runApp(const MyApp());
 }
 
@@ -26,13 +24,10 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  final box = GetStorage(); // Initialize GetStorage instance
-
+  final box = GetStorage();
   @override
   Widget build(BuildContext context) {
-    // Retrieve the saved language or default to 'en_US'
     String locale = box.read('language') ?? 'en_US';
-
     return ResponsiveSizer(
       builder: (context, orientation, screenType) {
         return ScreenUtilInit(

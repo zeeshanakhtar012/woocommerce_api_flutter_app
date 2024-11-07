@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:zrj/constants/colors.dart';
 import '../../../constants/fonts.dart';
+import '../../../controllers/controller_authentication.dart';
 import '../../../utils/form_valid.dart';
 import '../../../widgets/custom_button.dart';
 import '../../../widgets/custom_input_field.dart';
@@ -34,6 +35,7 @@ class ScreenSignUp extends StatelessWidget {
       padding: EdgeInsets.symmetric(vertical: 25.h, horizontal: 10.w),
     );
   }
+  ControllerAuthentication controller = Get.put(ControllerAuthentication());
 
   @override
   Widget build(BuildContext context) {
@@ -57,7 +59,7 @@ class ScreenSignUp extends StatelessWidget {
 
   Widget _buildHeader() {
     return Container(
-      height: 226.h,
+      // height: 226.h,
       width: Get.width,
       padding: EdgeInsets.symmetric(vertical: 22.h),
       decoration: BoxDecoration(
@@ -116,42 +118,49 @@ class ScreenSignUp extends StatelessWidget {
     return Column(
       children: [
         MyCostomTexttField(
+          controller: controller.firstName.value,
           hint: 'signup_first_name_hint'.tr, // Use translation key here
           validator: FormValidator.validateName,
         ).marginOnly(bottom: 10.h),
         MyInputField(
+          controller: controller.lastName.value,
           hint: 'signup_last_name_hint'.tr, // Use translation key here
           validator: FormValidator.validateName,
         ).marginOnly(bottom: 10.h),
         MyInputField(
+          controller: controller.userName.value,
           hint: 'signup_username_hint'.tr, // Use translation key here
           validator: FormValidator.validateUserName,
         ).marginOnly(bottom: 10.h),
         MyInputField(
+          controller: controller.email.value,
           hint: 'signup_email_hint'.tr, // Use translation key here
           validator: FormValidator.validateEmail,
         ).marginOnly(bottom: 10.h),
         MyInputField(
-          isPasswordField: true,
-          hint: 'signup_password_hint'.tr, // Use translation key here
-          validator: FormValidator.validatePassword,
+          controller: controller.country.value,
+          hint: 'Country',
         ).marginOnly(bottom: 10.h),
         MyInputField(
-          isPasswordField: true,
-          hint: 'signup_confirm_password_hint'.tr, // Use translation key here
-          validator: (value) {
-            // Add your validation logic here
-          },
-        ).marginOnly(bottom: 30.h),
+          controller: controller.address.value,
+          hint: 'Address', // Use translation key here
+          validator: FormValidator.validateAddress,
+        ).marginOnly(bottom: 10.h),
+        MyInputField(
+          controller: controller.phoneNumber.value,
+          keyboardType: TextInputType.phone,
+          hint: 'Phone',
+        ).marginOnly(bottom: 10.h),
       ],
     ).marginSymmetric(vertical: 30.h, horizontal: 32.w);
   }
 
   Widget _buildSignUpButton() {
     return CustomButton(
+      loading: controller.isLoading.value,
       onTap: () async {
         if (_formKey.currentState?.validate() ?? false) {
-          Get.to(HomeScreen());
+          controller.signupUser();
         } else {
           _showQuickAlert('signup_alert'.tr); // Use translation key here
         }

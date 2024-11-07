@@ -41,7 +41,7 @@ class ItemSaleDiscount extends StatelessWidget {
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(10),
                         child: CachedNetworkImage(
-                          imageUrl: product.images![0].imagePath!,
+                          imageUrl: product.images[0].src,
                           fit: BoxFit.cover,
                           height: 139.h,
                           width: 86.w,

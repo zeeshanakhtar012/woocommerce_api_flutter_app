@@ -1,8 +1,11 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import '../../../constants/colors.dart';
 import '../../../constants/fonts.dart';
+import '../../../controllers/controller_product.dart';
 import '../../../widgets/custom_listview_builder.dart';
 import '../../../widgets/skeleton/custom_skeleton.dart/cart_skeleton.dart';
 import '../../screens/screen_test.dart';
@@ -16,8 +19,12 @@ class LayoutCart extends StatefulWidget {
 }
 
 class _LayoutCartState extends State<LayoutCart> {
+
+  ProductWooCommerceController controller = Get.put(ProductWooCommerceController());
+
   @override
   Widget build(BuildContext context) {
+    log("Cart Items are ${controller.cartItems}");
     return Scaffold(
       backgroundColor: AppColors.whiteColor,
       appBar: AppBar(

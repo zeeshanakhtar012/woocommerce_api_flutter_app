@@ -32,7 +32,7 @@ class ScreenProductsCategory extends StatelessWidget {
                 productName: product.name,
                 productPrice: product.price.toString(),
                 sizes: ['S', 'M', 'L'], // Example sizes
-                colors: ['Red', 'Blue', 'Green'], productImage: product.imageUrl, // Example colors
+                colors: ['Red', 'Blue', 'Green'],  productImages: [product.imageUrl], // Example colors
               ));
             },
             child: buildProductItem(product),
