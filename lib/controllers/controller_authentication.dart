@@ -26,10 +26,6 @@ class ControllerAuthentication extends GetxController {
   final String consumerKey = ConsumerId.consumerKey;
   final String consumerSecret = ConsumerId.consumerSecret;
 
-  void showEmail() {
-    print('Entered email: ${email.value.text}');
-  }
-
   // Signup user
   Future<void> signupUser() async {
     isLoading(true); // Start loading
@@ -66,7 +62,6 @@ class ControllerAuthentication extends GetxController {
         log('User created: $userId');
         _saveUserId(userId);
         Get.offAll(ScreenLogin());
-        showEmailConfirmationMessage();
       } else {
         FirebaseUtils.showError('Failed to create user');
         log('Failed to create user: ${response.body}');
@@ -78,10 +73,6 @@ class ControllerAuthentication extends GetxController {
       isLoading(false); // End loading
     }
   }
-  // Show email confirmation message
-  void showEmailConfirmationMessage() {
-    FirebaseUtils.showSuccess('For password confirmation, an email has been sent to ${email.value.text}. Please create a password and log in to your app.');
-  }
   // Sign in user
   Future<void> signInUser() async {
     isLoading(true); // Start loading
@@ -90,56 +81,99 @@ class ControllerAuthentication extends GetxController {
       final response = await http.post(
         url,
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'username': userName.value.text, 'password': password.value.text}),
+        body: jsonEncode({
+          'username': userName.value.text,
+          'password': password.value.text,
+        }),
       );
+
+      // Log response details
+      log('Response status: ${response.statusCode}');
+      log('Response headers: ${response.headers}');
+      log('Response body: ${response.body}');
+
       if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        final token = data['token'];
-        final userId = data['user_id'];
-        _saveToken(token);
-        _saveUserId(userId);
-        Get.offAll(HomeScreen());
-        await fetchAndSaveUserProfile(userId);
+        try {
+          // Strip off the non-JSON prefix from the response body
+          final jsonString = response.body.replaceFirst(RegExp(r'^.*?{'), '{');
+
+          // Parse JSON response
+          final data = jsonDecode(jsonString);
+
+          // Access token from response
+          final token = data['token'];
+          final userEmail = data['user_email'];
+          final userNicename = data['user_nicename'];
+          final userDisplayName = data['user_display_name'];
+
+          // Check if token is valid
+          if (token != null) {
+            _saveToken(token); // Save the token
+            _saveUserDetails(userEmail, userNicename, userDisplayName); // Save user details
+
+            // Navigate to HomeScreen
+            Get.offAll(() => HomeScreen()); // Using the lambda function to navigate
+          } else {
+            log('Error: Missing token in the response');
+            FirebaseUtils.showError('Login failed: Token not found.');
+          }
+        } catch (jsonError) {
+          // Log JSON parsing errors
+          log('JSON decoding error: $jsonError');
+          FirebaseUtils.showError('Unexpected response format.');
+        }
       } else {
+        // Handle non-200 status codes
         FirebaseUtils.showError('Failed to sign in');
         log('Failed to sign in: ${response.body}');
       }
     } catch (e) {
+      // Log any other errors during request
       FirebaseUtils.showError('An error occurred');
       log('Error: $e');
     } finally {
       isLoading(false); // End loading
     }
   }
-  // fetch user details cart and wishlist
-  Future<void> fetchAndSaveUserProfile(int userId) async {
-    final url = Uri.parse("https://zrjfashionstyle.com/wp-json/wc/v3/customers/$userId");
+
+// Save user details to shared preferences
+  Future<void> _saveUserDetails(String userEmail, String userNicename, String userDisplayName) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('user_email', userEmail);
+    await prefs.setString('user_nicename', userNicename);
+    await prefs.setString('user_display_name', userDisplayName);
+  }
+
+
+  // Fetch user details using email (or other identifier)
+  Future<void> fetchUserDetails(String email) async {
+    final url = Uri.parse("https://zrjfashionstyle.com/wp-json/wc/v3/customers?email=$email");
     final response = await http.get(
       url,
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Basic ${base64Encode(utf8.encode('consumer_key:consumer_secret'))}',
+        'Authorization': 'Basic ${base64Encode(utf8.encode('$consumerKey:$consumerSecret'))}',
       },
     );
 
     if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
+      final data = jsonDecode(response.body)[0]; // Assuming the first result is the correct one
       await _saveUserProfile(
           data['first_name'],
           data['last_name'],
-          data['phone'],
-          data['address_1'],
           data['email'],
+          data['phone'],
+          data['billing']['address_1'],
           data['meta_data'].firstWhere((meta) => meta['key'] == 'profile_image', orElse: () => {'value': ''})['value']
       );
       FirebaseUtils.showSuccess('User successfully Logged in!');
     } else {
-      print('Failed to fetch user profile: ${response.body}');
-      FirebaseUtils.showError('Failed to login. Please try again.');
+      FirebaseUtils.showError('Failed to fetch user profile.');
     }
   }
-  // user profile
-  Future<void> _saveUserProfile(String firstName, String lastName, String email, String profileImage, String phoneNumber, String address  ) async {
+
+  // Save user profile
+  Future<void> _saveUserProfile(String firstName, String lastName, String email, String phoneNumber, String address, String profileImage) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('first_name', firstName);
     await prefs.setString('last_name', lastName);
@@ -159,16 +193,6 @@ class ControllerAuthentication extends GetxController {
     await prefs.setString('token', token);
   }
 
-  Future<int?> getUserId() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    return prefs.getInt('user_id');
-  }
-
-  Future<String?> getToken() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    return prefs.getString('token');
-  }
-
   Future<Map<String, String?>> getUserProfile() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     return {
@@ -178,13 +202,4 @@ class ControllerAuthentication extends GetxController {
       'profile_image': prefs.getString('profile_image'),
     };
   }
-  // void clearAllFields() {
-  //   email.value.clear();
-  //   firstName.value.clear();
-  //   lastName.value.clear();
-  //   phoneNumber.value.clear();
-  //   address.value.clear();
-  //   country.value.clear();
-  //   address.value.clear();
-  // }
 }

@@ -73,7 +73,7 @@ class _ScreenProductDetailsState extends State<ScreenProductDetails> {
         leading: IconButton(
           onPressed: () => Get.back(),
           icon: CircleAvatar(
-            radius: 10.r,
+            radius: 25.r,
             backgroundColor: AppColors.appRedColor,
             child: Icon(Icons.arrow_back, color: Colors.white),
           ),
@@ -121,7 +121,7 @@ class _ScreenProductDetailsState extends State<ScreenProductDetails> {
         child: ElevatedButton(
           onPressed: () async {
             if (widget.productId != null) {
-              await controller.addProductToCartLocal;
+              // await controller.addProductToCartLocal;
             } else {
               print('Product ID is null');
             }

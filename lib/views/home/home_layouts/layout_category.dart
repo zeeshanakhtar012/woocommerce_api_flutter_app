@@ -1,5 +1,4 @@
 import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -45,12 +44,12 @@ class LayoutCategory extends StatelessWidget {
                 itemBuilder: (context, index) {
                   final category = productsController.categoryList[index];
                   return CustomImageCard(
-                    imagePath: category['image'] != null ? category['image']['src'] : 'assets/images/default_image.png',
-                    title: category['name'],
+                    imagePath: category.image != null ? category.image! : 'assets/images/default_image.png', // Access image as a String
+                    title: category.name,  // Access name directly from Category
                     onTap: () {
-                      productsController.selectCategory(category['id'].toString());
-                      log("Category Name ${category['name']}");
-                      Get.to(() => ProductsListScreen(categoryName: category['name']));
+                      productsController.selectCategory(category.id.toString());  // Access id directly
+                      log("Category Name ${category.name}");
+                      Get.to(() => ProductsListScreen(categoryName: category.name));  // Access name directly
                     },
                   );
                 },
@@ -79,8 +78,6 @@ class CustomImageCard extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       child: Container(
-        // width: 250.sp,
-        // height: 150.sp,
         margin: EdgeInsets.all(8.sp),
         padding: EdgeInsets.all(8.sp),
         decoration: BoxDecoration(
@@ -111,7 +108,9 @@ class CustomImageCard extends StatelessWidget {
                   ),
                 ],
                 image: DecorationImage(
-                  image: imagePath.startsWith('http') ? NetworkImage(imagePath) : AssetImage(imagePath) as ImageProvider,
+                  image: imagePath.startsWith('http')
+                      ? NetworkImage(imagePath)
+                      : AssetImage(imagePath) as ImageProvider,
                   fit: BoxFit.cover,
                 ),
               ),

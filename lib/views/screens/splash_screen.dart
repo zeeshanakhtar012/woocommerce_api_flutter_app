@@ -22,7 +22,7 @@ class _SplashScreenState extends State<SplashScreen> {
   _navigateToNextScreen() async {
     await Future.delayed(Duration(seconds: 3));
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? token = prefs.getString('access_token');
+    String? token = prefs.getString('token');
     if (token != null && token.isNotEmpty) {
       Get.offAll(HomeScreen());
     } else {

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
+import 'package:zrj/views/screens/authentication_screens/screen_login.dart';
 import '../../../constants/colors.dart';
 import '../../../constants/fonts.dart';
 import '../../items/item_profile.dart';
@@ -153,7 +154,7 @@ class LayoutProfile extends StatelessWidget {
                             middleText: "are_you_sure_logout".tr,  // Use translation key
                             confirm: TextButton(
                               onPressed: () {
-                                // Logout logic here
+                                Get.to(ScreenLogin());
                               },
                               child: Text(
                                 "proceed".tr,  // Use translation key

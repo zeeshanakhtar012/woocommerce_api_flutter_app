@@ -1,20 +1,21 @@
 import 'dart:developer';
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:zrj/views/screens/screen_products_details.dart';
 import 'package:zrj/views/screens/test.dart';
 import '../../../constants/colors.dart';
 import '../../../constants/fonts.dart';
 import '../../../controllers/controller_product.dart';
+import '../../../model/category.dart';
 import '../../../widgets/custom_field_search.dart';
 import '../../../widgets/skeleton/custom_skeleton.dart/cart_skeleton.dart';
+import '../../screens/screen_product.dart';
 import 'layout_cart.dart';
 
 class LayoutHome extends StatelessWidget {
-  LayoutHome({super.key});
-
   final List<Product> sampleSalesDiscount = [
     Product(
       name: "Smartphone",
@@ -39,10 +40,11 @@ class LayoutHome extends StatelessWidget {
   // Filter states
   final _FilterController filterController = Get.put(_FilterController());
   ProductWooCommerceController controller = Get.put(ProductWooCommerceController());
+  Category? category;
 
   @override
   Widget build(BuildContext context) {
-    controller.fetchCategories();
+    // controller.fetchCategories();
     log("Categories = ${controller.categoryList.length}");
     return Scaffold(
       body: SizedBox(
@@ -96,19 +98,16 @@ class LayoutHome extends StatelessWidget {
                     scrollDirection: Axis.horizontal,
                     itemCount: controller.categoryList.length,
                     itemBuilder: (context, index) {
+                      var category = controller.categoryList[index];
                       return GestureDetector(
                         onTap: () {
-                          log("Image path = ${controller.categoryList[index].imageUrl}");
-                          Get.to(() => ScreenProductDetails(
-                            productName: controller.categoryList[index].name,
-                            productPrice: controller.categoryList[index].price.toString(),
-                            sizes: ['S', 'M', 'L'], // Example sizes
-                            colors: ['Red', 'Blue', 'Green'],
-                            productImages: [controller.categoryList[index].imageUrl],
-                          ));
+                          if (category != null) {
+                            controller.selectCategory("${category.id ?? ''}");
+                            log("Category Name ${category.name}");
+                            Get.to(() => ProductsListScreen(categoryName: category.name));
+                          }
                         },
-                        child: buildCategoryItem(controller.categoryList[index])
-                            .marginOnly(left: index == 0 ? 20.w : 10.w),
+                        child: buildCategoryItem(category).marginOnly(left: index == 0 ? 20.w : 10.w),
                       );
                     },
                   ),
@@ -133,14 +132,15 @@ class LayoutHome extends StatelessWidget {
   }
 
   // Category item widget
-  Widget buildCategoryItem(Product product) {
+  Widget buildCategoryItem(Category category) {
     return Container(
-      width: 150.w,
+      width: 200.w, // Increased width
+      height: 200.h, // Increased height
       padding: EdgeInsets.all(10.sp),
       margin: EdgeInsets.symmetric(vertical: 10.h),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(15),
-        color: Colors.white,
+        color: Colors.white.withOpacity(0), // Make the background transparent so the blur effect is visible
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.1),
@@ -149,22 +149,38 @@ class LayoutHome extends StatelessWidget {
           ),
         ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Stack(
+        alignment: Alignment.center,
         children: [
           ClipRRect(
-            borderRadius: BorderRadius.circular(10),
-            child: Image.network(product.imageUrl,
-                height: 100.h, width: 130.w, fit: BoxFit.cover),
+            borderRadius: BorderRadius.circular(15),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0), // Apply the blur effect to the background image
+              child: Container(
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    image: NetworkImage(category.image ?? ''),
+                    fit: BoxFit.cover,
+                  ),
+                  borderRadius: BorderRadius.circular(15),
+                ),
+              ),
+            ),
           ),
-          SizedBox(height: 10.h),
           Text(
-            product.name,
-            style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold),
-          ),
-          Text(
-            '\$${product.price.toStringAsFixed(2)}',
-            style: TextStyle(color: Colors.green, fontSize: 14.sp),
+            category.name,
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: Colors.white, // White text to stand out on the blurry background
+              fontSize: 16.sp,
+              shadows: [
+                Shadow(
+                  blurRadius: 10.0,
+                  color: Colors.black.withOpacity(0.7),
+                  offset: Offset(2.0, 2.0),
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -237,7 +253,6 @@ class LayoutHome extends StatelessWidget {
   }
 }
 
-
 class _FilterController extends GetxController {
   var selectedCategories = <String>[].obs;
   var selectedColors = <String>[].obs;
@@ -262,7 +277,7 @@ class _FilterController extends GetxController {
   }
 }
 
-// Product model class
+// Example Product class
 class Product {
   final String name;
   final double price;

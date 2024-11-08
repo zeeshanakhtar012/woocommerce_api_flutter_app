@@ -52,7 +52,7 @@ class _MyAppState extends State<MyApp> {
               locale: Locale(locale.split('_')[0], locale.split('_')[1]), // Load saved locale
               fallbackLocale: const Locale('en', 'US'),
               theme: lightTheme,
-              home: SplashScreen(), // Starting screen (SplashScreen can navigate to LanguageSelectionScreen)
+              home: SplashScreen(),
               defaultTransition: Transition.fadeIn,
               transitionDuration: const Duration(milliseconds: 500),
               builder: (context, child) {

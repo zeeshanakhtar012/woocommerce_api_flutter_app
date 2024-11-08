@@ -103,7 +103,7 @@ class ScreenLogin extends StatelessWidget {
       children: [
         MyCostomTexttField(
           controller:controller.userName.value,
-          hint: 'User Name'.tr, // Use translation key
+          hint: 'UserName or Email'.tr, // Use translation key
           // validator: FormValidator.validateEmail,
         ).marginOnly(bottom: 10.h),
         MyCostomTexttField(
@@ -132,12 +132,14 @@ class ScreenLogin extends StatelessWidget {
 
   Widget _buildSignInButton() {
     return CustomButton(
-      // loading: controller.isLoading.value,
+      // onTap: (){
+      //   Get.to(HomeScreen());
+      // },
+      loading: controller.isLoading.value,
       onTap: () async {
         if (_formKey.currentState?.validate() ?? false) {
           controller.signInUser();
         }
-
       },
       text: 'login_sign_in'.tr, // Use translation key
       textColor: Colors.white,

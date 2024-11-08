@@ -32,25 +32,25 @@ class ProductsScreen extends StatelessWidget {
                 children: productsController.categoryList.map((category) {
                   return GestureDetector(
                     onTap: () {
-                      productsController.selectCategory(category['id'].toString());
+                      productsController.selectCategory(category.id.toString());
                     },
                     child: Container(
                       padding: EdgeInsets.all(8.0),
                       margin: EdgeInsets.symmetric(horizontal: 10.0),
                       decoration: BoxDecoration(
-                        color: productsController.selectedCategory.value == category['id'].toString()
+                        color: productsController.selectedCategory.value == category.id.toString()
                             ? Colors.blue
                             : Colors.grey,
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Row(
                         children: [
-                          category['image'] != null
-                              ? Image.network(category['image']['src'], height: 40, width: 40)
+                          category.imageUrl.isNotEmpty
+                              ? Image.network(category.imageUrl, height: 40, width: 40)
                               : SizedBox.shrink(),
                           SizedBox(width: 10),
                           Text(
-                            category['name'],
+                            category.name,
                             style: TextStyle(
                               color: Colors.white,
                             ),
@@ -81,11 +81,11 @@ class ProductsScreen extends StatelessWidget {
                   itemBuilder: (context, index) {
                     final product = productsController.products[index];
                     return ListTile(
-                      leading: product['images'] != null && product['images'].isNotEmpty
-                          ? Image.network(product['images'][0]['src'], height: 50, width: 50)
+                      leading: product.images.isNotEmpty
+                          ? Image.network(product.images[0]['src'], height: 50, width: 50)
                           : SizedBox.shrink(),
-                      title: Text(product['name']),
-                      subtitle: Text('Price: \$${product['price']}'),
+                      title: Text(product.name),
+                      subtitle: Text('Price: \$${product.price}'),
                     );
                   },
                 );

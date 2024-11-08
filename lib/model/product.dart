@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:zrj/model/category.dart';
+
 class Product {
   final int id;
   final String name;
@@ -196,23 +198,6 @@ class Product {
     );
   }
 }
-
-class Category {
-  final int id;
-  final String name;
-  final String slug;
-
-  Category({required this.id, required this.name, required this.slug});
-
-  factory Category.fromJson(Map<String, dynamic> json) {
-    return Category(
-      id: json['id'],
-      name: json['name'],
-      slug: json['slug'],
-    );
-  }
-}
-
 class ProductImage {
   final int id;
   final String dateCreated;
