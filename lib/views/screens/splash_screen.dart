@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:zrj/constants/colors.dart';
-import 'package:zrj/views/screens/language_selection_screen.dart';
-import '../home/home_screen.dart';
-import 'intro_screen.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:zrj/constants/colors.dart';
+import 'package:zrj/views/screens/authentication_screens/screen_login.dart';
+import 'package:zrj/views/home/home_screen.dart';
+import 'package:zrj/views/screens/authentication_screens/screen_signup.dart';
+
+import '../../controllers/controller_authentication.dart';
 
 class SplashScreen extends StatefulWidget {
   @override
@@ -13,21 +14,24 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+  final ControllerAuthentication authController = Get.put(ControllerAuthentication());
+
   @override
   void initState() {
     super.initState();
-    _navigateToNextScreen();
+    _checkAuthenticationStatus();
   }
 
-  _navigateToNextScreen() async {
-    await Future.delayed(Duration(seconds: 3));
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? token = prefs.getString('token');
-    if (token != null && token.isNotEmpty) {
+  // Check if user is authenticated
+  _checkAuthenticationStatus() async {
+    await Future.delayed(Duration(seconds: 3));  // Simulate the splash screen delay
+
+    bool isAuthenticated = await authController.isAuthenticated();  // Check if authenticated
+
+    if (isAuthenticated) {
       Get.offAll(HomeScreen());
     } else {
-      Get.offAll(LanguageSelectionScreen());
-      Get.off(IntroScreen());
+      Get.offAll(ScreenLogin());
     }
   }
 
@@ -35,18 +39,16 @@ class _SplashScreenState extends State<SplashScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.whiteColor,
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Container(
-            height: 124.h,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-                image: DecorationImage(
-                    image: AssetImage("assets/images/final  ZRJ.png"))),
-          ).marginOnly(left: 71.w, right: 70.w),
-        ],
+      body: Center(
+        child: Container(
+          height: 124.h,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage("assets/images/final  ZRJ.png"),
+            ),
+          ),
+        ).marginOnly(left: 71.w, right: 70.w),
       ),
     );
   }

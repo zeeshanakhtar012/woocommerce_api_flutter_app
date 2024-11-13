@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:zrj/constants/colors.dart';
+import 'package:zrj/views/screens/authentication_screens/screen_signup.dart';
 import 'package:zrj/views/screens/screen_test.dart';
 import 'authentication_screens/screen_login.dart';
 
@@ -99,12 +100,12 @@ class _IntroScreenState extends State<IntroScreen> {
         curve: Curves.easeIn,
       );
     } else {
-      Get.offAll(ScreenLogin());
+      Get.offAll(ScreenSignUp());
     }
   }
 
   void _onSkip() {
-    Get.offAll(ScreenLogin());
+    Get.offAll(ScreenSignUp());
   }
 
   @override

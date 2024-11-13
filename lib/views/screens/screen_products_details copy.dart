@@ -25,24 +25,24 @@ class ScreenProductDetails extends StatelessWidget {
         backgroundColor: AppColors.whiteColor,
         elevation: 0,
         leading: AppFontsStyle.buildBackButton(context),
-        actions: [
-          InkWell(
-            onTap: () {
-              Get.to(() => ScreenFavouriteProduct());
-            },
-            child: Container(
-              height: 37.h,
-              width: 37.w,
-              padding: EdgeInsets.all(8.sp),
-              margin: EdgeInsets.only(right: 10.w),
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Color(0xff4C6042),
-              ),
-              child: SvgPicture.asset("assets/icons/fav_icon_fill.svg"),
-            ),
-          ),
-        ],
+        // actions: [
+        //   InkWell(
+        //     onTap: () {
+        //       Get.to(() => ScreenFavouriteProduct());
+        //     },
+        //     child: Container(
+        //       height: 37.h,
+        //       width: 37.w,
+        //       padding: EdgeInsets.all(8.sp),
+        //       margin: EdgeInsets.only(right: 10.w),
+        //       decoration: BoxDecoration(
+        //         shape: BoxShape.circle,
+        //         color: Color(0xff4C6042),
+        //       ),
+        //       child: SvgPicture.asset("assets/icons/fav_icon_fill.svg"),
+        //     ),
+        //   ),
+        // ],
       ),
       body: SafeArea(
         child: Column(

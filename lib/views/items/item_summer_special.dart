@@ -32,7 +32,7 @@ class DressItemCard extends StatelessWidget {
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(20.r),
                       child: FadeInImage(
-                        image:  NetworkImage(product.images.first.src),
+                        image:  NetworkImage(product.images!.first.src!),
                         placeholder: AssetImage(
                             'assets/images/image_dress.png'),
                         fit: BoxFit.cover,

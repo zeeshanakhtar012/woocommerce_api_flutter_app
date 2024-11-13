@@ -68,7 +68,7 @@ class ItemWishListProduct extends StatelessWidget {
                                   borderRadius: BorderRadius.circular(15),
                                   boxShadow: [AppColors.myCustomBoxShadow],
                                   image: DecorationImage(
-                                    image: NetworkImage(product.images.first.src),
+                                    image: NetworkImage(product.images!.first.src!),
                                     fit: BoxFit.cover,
                                   ),
                                 ),

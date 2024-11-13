@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:zrj/constants/colors.dart';
+import 'package:zrj/views/screens/authentication_screens/screen_login.dart';
 import '../../../constants/fonts.dart';
 import '../../../controllers/controller_authentication.dart';
 import '../../../utils/form_valid.dart';
@@ -42,15 +43,33 @@ class ScreenSignUp extends StatelessWidget {
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
-          child: Form(
-            key: _formKey,
-            child: Column(
-              children: [
-                _buildHeader(),
-                _buildFormFields(),
-                _buildSignUpButton(),
-              ],
-            ),
+          child: Stack(
+            children: [
+              Form(
+                key: _formKey,
+                child: Column(
+                  children: [
+                    _buildHeader(),
+                    _buildFormFields(),
+                    _buildSignUpButton(),
+                  ],
+                ),
+              ),
+              Obx(() {
+                if (controller.isLoading.value) {
+                  return Container(
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.5),
+                    ),
+                    child: Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                  );
+                } else {
+                  return Container();
+                }
+              }),
+            ],
           ),
         ),
       ),
@@ -86,7 +105,7 @@ class ScreenSignUp extends StatelessWidget {
                 alignment: Alignment.topRight,
                 child: InkWell(
                   onTap: () {
-                    Get.back();
+                    Get.to(ScreenLogin());
                   },
                   child: Text(
                     'signup_signin_text'.tr, // Use translation key here
@@ -136,6 +155,10 @@ class ScreenSignUp extends StatelessWidget {
           controller: controller.email.value,
           hint: 'signup_email_hint'.tr, // Use translation key here
           validator: FormValidator.validateEmail,
+        ).marginOnly(bottom: 10.h),
+        MyInputField(
+          controller: controller.password.value,
+          hint: 'Password'.tr,
         ).marginOnly(bottom: 10.h),
         MyInputField(
           controller: controller.country.value,

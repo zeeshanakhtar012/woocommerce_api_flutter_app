@@ -3,37 +3,22 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:zrj/constants/colors.dart';
+import 'package:zrj/model/product.dart';
 
+import '../../../controllers/controller_product.dart';
 import '../../../widgets/custom_field_search.dart';
 import 'layout_cart.dart';
 
-class CustomProduct {
-  final String name;
-
-  final String imagePath;
-  final String price;
-  final String color;
-  final String size;
-
-  CustomProduct({
-    required this.name,
-
-    required this.imagePath,
-    required this.price,
-    required this.color,
-    required this.size,
-  });
-}
-
 class DressItemCard extends StatelessWidget {
-  final CustomProduct product;
+  final Product product;
 
   DressItemCard({required this.product});
 
   @override
   Widget build(BuildContext context) {
     return Card(
-      elevation: 8,
+      elevation: 2,
+      shadowColor: Colors.grey.withOpacity(.3),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(15), // Rounded corners
       ),
@@ -42,7 +27,8 @@ class DressItemCard extends StatelessWidget {
         child: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [Colors.white, Colors.grey.shade200], // Gradient background
+              colors: [Colors.white, Colors.grey.shade200],
+              // Gradient background
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
@@ -54,14 +40,15 @@ class DressItemCard extends StatelessWidget {
                 width: double.infinity,
                 height: 120.sp,
                 child: Image.network(
-                  product.imagePath,
+                  product.images![0].src ?? '',
                   fit: BoxFit.cover,
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 8.0, vertical: 4.0),
                 child: Text(
-                  product.name,
+                  product.name!,
                   style: TextStyle(
                     fontSize: 16.sp, // Responsive text size
                     fontWeight: FontWeight.bold,
@@ -69,9 +56,21 @@ class DressItemCard extends StatelessWidget {
                   ),
                 ),
               ),
-
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 8.0, vertical: 4.0),
+                child: Text(
+                  "Total Sales ${product.totalSales}",
+                  style: TextStyle(
+                    fontSize: 16.sp, // Responsive text size
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 8.0, vertical: 4.0),
                 child: Text(
                   "\$${product.price}",
                   style: TextStyle(
@@ -96,55 +95,14 @@ class LayoutSearch extends StatefulWidget {
 }
 
 class _LayoutSearchState extends State<LayoutSearch> {
-  List<CustomProduct> products = [];
-  List<CustomProduct> filteredProducts = [];
+  List<Product> products = [];
   String searchQuery = "";
-
-  @override
-  void initState() {
-    super.initState();
-    products = [
-      CustomProduct(
-        name: 'Clothes',
-        imagePath: 'https://images.unsplash.com/photo-1651047566242-1f93897b907a?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-        price: "50",
-        color: "red",
-        size: "M",
-      ),
-      CustomProduct(
-        name: 'Shoes',
-        imagePath: 'https://images.unsplash.com/photo-1651047566242-1f93897b907a?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-        price: "80",
-        color: "blue",
-        size: "L",
-      ),
-      CustomProduct(
-        name: 'Hat',
-        imagePath: 'https://images.unsplash.com/photo-1651047566242-1f93897b907a?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-        price: "20",
-        color: "green",
-        size: "S",
-      ),
-      // Add more products as needed
-    ];
-    filteredProducts = products;
-  }
-
-  void filterProducts(String query) {
-    if (query.isNotEmpty) {
-      filteredProducts = products
-          .where((product) => product.name.toLowerCase().contains(query.toLowerCase()))
-          .toList();
-    } else {
-      filteredProducts = products;
-    }
-    setState(() {
-      searchQuery = query;
-    });
-  }
+  ProductWooCommerceController controller = Get.put(
+      ProductWooCommerceController());
 
   @override
   Widget build(BuildContext context) {
+    controller.fetchAllProducts();
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -170,6 +128,7 @@ class _LayoutSearchState extends State<LayoutSearch> {
                 child: RefreshIndicator(
                   color: Colors.red, // Change this to your primary color
                   onRefresh: () async {
+                    controller.fetchAllProducts();
                     return await Future.delayed(Duration(seconds: 2));
                   },
                   child: Column(
@@ -177,7 +136,7 @@ class _LayoutSearchState extends State<LayoutSearch> {
                       Row(
                         children: [
                           CustomTextFieldSearch(
-                            width: Get.width/1.35,
+                            width: Get.width / 1.35,
                             hintText: 'Search',
                             suffixIcon: Container(
                               height: 20.h,
@@ -190,7 +149,9 @@ class _LayoutSearchState extends State<LayoutSearch> {
                                 Icons.search,
                                 color: Colors.white,
                               ),
-                            ), onChanged: (value) => filterProducts(value),
+                            ),
+                            onChanged: (value) =>
+                                controller.filterProducts(value),
                           ),
                           GestureDetector(
                             onTap: () {
@@ -198,8 +159,9 @@ class _LayoutSearchState extends State<LayoutSearch> {
                             },
                             child: CircleAvatar(
                               radius: 23.r,
-                              backgroundColor:AppColors.buttonColor,
-                              child: SvgPicture.asset("assets/icons/icon_store.svg"),
+                              backgroundColor: AppColors.buttonColor,
+                              child: SvgPicture.asset(
+                                  "assets/icons/icon_store.svg"),
                             ),
                           ),
                         ],
@@ -207,7 +169,8 @@ class _LayoutSearchState extends State<LayoutSearch> {
                       Row(
                         children: [
                           Text(
-                            "${filteredProducts.length} items found",
+                            "${controller.filteredProductList
+                                .length} items found",
                             style: TextStyle(
                               color: Color(0xff002654),
                               fontSize: 14.sp,
@@ -215,24 +178,35 @@ class _LayoutSearchState extends State<LayoutSearch> {
                             ),
                           ),
                         ],
-                      ).paddingOnly(top: 10,left: 10),
-                      Expanded(
-                        child: GridView.builder(
-                          padding: EdgeInsets.only(top: 20.h, bottom: 60.h),
-                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            crossAxisSpacing: 20.w,
-                            mainAxisSpacing: 20.h,
-                            childAspectRatio: 0.75,
-                          ),
-                          itemCount: filteredProducts.length,
-                          itemBuilder: (BuildContext context, int index) {
-                            return DressItemCard(
-                              product: filteredProducts[index],
-                            );
-                          },
-                        ),
-                      ),
+                      ).paddingOnly(top: 10, left: 10),
+                      Obx(() {
+                        if(controller.isLoading.value){
+                          return CircularProgressIndicator();
+                        }
+                         else if(controller.filteredProductList.isEmpty){
+                           return Center(
+                             child: Text("No Products found available"),
+                           );
+                        }else {
+                          return Expanded(
+                            child: GridView.builder(
+                              padding: EdgeInsets.only(top: 20.h, bottom: 60.h),
+                              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 2,
+                                crossAxisSpacing: 20.w,
+                                mainAxisSpacing: 20.h,
+                                childAspectRatio: 0.75,
+                              ),
+                              itemCount: controller.filteredProductList.length,
+                              itemBuilder: (BuildContext context, int index) {
+                                return DressItemCard(
+                                  product: controller.filteredProductList[index],
+                                );
+                              },
+                            ),
+                          );
+                        }
+                      }),
                     ],
                   ).marginSymmetric(horizontal: 10.w),
                 ),

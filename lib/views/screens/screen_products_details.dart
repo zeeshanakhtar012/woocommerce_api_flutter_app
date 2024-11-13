@@ -2,12 +2,13 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
+import 'package:zrj/controllers/controller_payment.dart';
+import 'package:zrj/utils/firebase_utils.dart';
 import '../../constants/colors.dart';
 import '../../controllers/controller_product.dart';
-import '../../widgets/rating_indicator.dart';
-import '../home/home_layouts/layout_cart.dart';
+import '../../model/product.dart';
+import '../../model/user.dart';
 
 class ScreenProductDetails extends StatefulWidget {
   final String productName;
@@ -18,6 +19,8 @@ class ScreenProductDetails extends StatefulWidget {
   final String? productDescription;
   final List<String> sizes;
   final List<String> colors;
+  Product? product;
+  UserModel? user;
 
   ScreenProductDetails({
     required this.productName,
@@ -36,6 +39,7 @@ class ScreenProductDetails extends StatefulWidget {
 
 class _ScreenProductDetailsState extends State<ScreenProductDetails> {
   final ProductWooCommerceController controller = Get.put(ProductWooCommerceController());
+  PaymentsController paymentsController = Get.put(PaymentsController());
 
   Color _selectedColor = Colors.red;
   String _selectedSize = 'S';
@@ -78,16 +82,16 @@ class _ScreenProductDetailsState extends State<ScreenProductDetails> {
             child: Icon(Icons.arrow_back, color: Colors.white),
           ),
         ),
-        actions: [
-          IconButton(
-            onPressed: () => Get.to(() => LayoutCart(isHome: true)),
-            icon: CircleAvatar(
-              radius: 25.r,
-              backgroundColor: AppColors.buttonColor,
-              child: SvgPicture.asset("assets/icons/icon_store.svg"),
-            ),
-          ),
-        ],
+        // actions: [
+        //   IconButton(
+        //     onPressed: () => Get.to(() => LayoutCart(isHome: true)),
+        //     icon: CircleAvatar(
+        //       radius: 25.r,
+        //       backgroundColor: AppColors.buttonColor,
+        //       child: SvgPicture.asset("assets/icons/icon_store.svg"),
+        //     ),
+        //   ),
+        // ],
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -118,15 +122,76 @@ class _ScreenProductDetailsState extends State<ScreenProductDetails> {
       ),
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: ElevatedButton(
+        child:ElevatedButton(
           onPressed: () async {
             if (widget.productId != null) {
-              // await controller.addProductToCartLocal;
+              // Initialize the product with null checks and default values
+              Product product = Product(
+                id: widget.productId!,
+                name: widget.productName ?? "N/A",
+                price: "${widget.productPrice}" ,
+                description: widget.productDescription ?? "N/A",
+                size: (widget.sizes != null && widget.sizes!.isNotEmpty) ? widget.sizes![0] : "N/A",
+                images: widget.productImages != null
+                    ? widget.productImages!.map((url) => ProductImage(src: url)).toList()
+                    : [], // Empty list if images are null
+                color: (widget.colors != null && widget.colors!.isNotEmpty) ? widget.colors![0] : "N/A",
+                slug: widget.product?.slug ?? "default-slug",
+                permalink: widget.product?.permalink ?? "default-permalink",
+                // dateCreated: widget.product?.dateCreated ?? DateTime.now(),
+                // dateCreatedGmt: widget.product?.dateCreatedGmt ?? DateTime.now(),
+                // dateModified: widget.product?.dateModified ?? DateTime.now(),
+                // dateModifiedGmt: widget.product?.dateModifiedGmt ?? DateTime.now(),
+              );
+
+              // Initialize billing and shipping with null checks
+              Billing billing = Billing(
+                phone: widget.user?.billing?.phone ?? "N/A",
+                address2: widget.user?.billing?.address2 ?? "N/A",
+                address1: widget.user?.billing?.address1 ?? "N/A",
+                city: widget.user?.shipping?.city ?? "N/A",
+                state: widget.user?.shipping?.state ?? "N/A",
+                country: widget.user?.shipping?.country ?? "N/A",
+              );
+
+              Shipping shipping = Shipping(
+                address1: widget.user?.shipping?.address1 ?? "N/A",
+                city: widget.user?.shipping?.city ?? "N/A",
+                state: widget.user?.shipping?.state ?? "N/A",
+                country: widget.user?.shipping?.country ?? "N/A",
+              );
+
+              // Initialize the user model with null checks
+              UserModel user = UserModel(
+                id: widget.user?.id ?? 0,
+                firstName: widget.user?.firstName ?? "John",
+                lastName: widget.user?.lastName ?? "Doe",
+                email: widget.user?.email ?? "example@example.com",
+                avatarUrl: widget.user?.avatarUrl ?? "https://via.placeholder.com/150",
+                billing: billing,
+                shipping: shipping,
+                isPayingCustomer: true,
+              );
+
+              // Call the payment controller
+              paymentsController.makePayment(
+                getTotalPrice(),
+                product,
+                user,
+                onSuccess: (infoData) {
+                  print("Payment successful: $infoData");
+                  Get.snackbar('Success', 'Your order has been placed.');
+                },
+                onError: (error) {
+                  print("Payment failed: $error");
+                  Get.snackbar('Error', 'Payment failed. Please try again.');
+                },
+              );
             } else {
               print('Product ID is null');
             }
           },
-          child: controller.isLoading.value? CircularProgressIndicator() : Text('Add to Cart'),
+          child:  Text('Buy'),
           style: ElevatedButton.styleFrom(
             backgroundColor: AppColors.buttonColor,
             padding: EdgeInsets.symmetric(vertical: 15),

@@ -19,8 +19,7 @@ class _HomeScreenState extends State<HomeScreen> {
     LayoutHome(),
     LayoutSearch(),
     LayoutCategory(),
-    LayoutCart(isHome: true),
-    LayoutProfile(),
+    LayoutProfile(), // Only 4 tabs will be here
   ];
 
   int currentIndex = 0;
@@ -56,7 +55,7 @@ class _HomeScreenState extends State<HomeScreen> {
           child: PageView(
             physics: NeverScrollableScrollPhysics(),
             controller: _pageController,
-            children: tabs,
+            children: tabs, // Only the 4 tabs will be displayed
           ),
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
@@ -78,8 +77,7 @@ class _HomeScreenState extends State<HomeScreen> {
               _buildBottomNavigationItem("assets/icons/icon_home.svg", 0),
               _buildBottomNavigationItem("assets/icons/icon_search.svg", 1),
               _buildBottomNavigationItem("assets/icons/icon_category.svg", 2),
-              _buildBottomNavigationItem("assets/icons/icon_cart.svg", 3),
-              _buildBottomNavigationItem("assets/icons/icon_profile.svg", 4),
+              _buildBottomNavigationItem("assets/icons/icon_profile.svg", 3),
             ],
             selectedIndex: currentIndex,
           ).marginSymmetric(horizontal: 12),
@@ -109,7 +107,7 @@ class _HomeScreenState extends State<HomeScreen> {
         fit: BoxFit.contain,
         placeholderBuilder: (BuildContext context) =>
             CircularProgressIndicator(),
-      ).marginOnly(right: index != 4 ? 24.w : 0.0),
+      ).marginOnly(right: index != 3 ? 24.w : 0.0), // Adjust the margin
     );
   }
 }

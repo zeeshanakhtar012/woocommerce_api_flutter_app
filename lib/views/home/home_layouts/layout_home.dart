@@ -1,153 +1,158 @@
+
+
 import 'dart:developer';
 import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
-import 'package:zrj/views/screens/screen_products_details.dart';
-import 'package:zrj/views/screens/test.dart';
+import 'package:zrj/controllers/controller_authentication.dart';
+import 'package:zrj/views/home/home_layouts/layout_profile.dart';
+
 import '../../../constants/colors.dart';
 import '../../../constants/fonts.dart';
 import '../../../controllers/controller_product.dart';
 import '../../../model/category.dart';
+import '../../../model/product.dart';
 import '../../../widgets/custom_field_search.dart';
 import '../../../widgets/skeleton/custom_skeleton.dart/cart_skeleton.dart';
 import '../../screens/screen_product.dart';
+import '../../screens/test.dart';
 import 'layout_cart.dart';
 
 class LayoutHome extends StatelessWidget {
-  final List<Product> sampleSalesDiscount = [
-    Product(
-      name: "Smartphone",
-      price: 250.0,
-      imageUrl:
-      "https://images.unsplash.com/photo-1651047566242-1f93897b907a?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    ),
-    Product(
-      name: "Shoes",
-      price: 40.0,
-      imageUrl:
-      "https://images.unsplash.com/photo-1651047566242-1f93897b907a?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    ),
-    Product(
-      name: "Chair",
-      price: 35.0,
-      imageUrl:
-      "https://images.unsplash.com/photo-1651047566242-1f93897b907a?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    ),
-  ];
 
   // Filter states
   final _FilterController filterController = Get.put(_FilterController());
-  ProductWooCommerceController controller = Get.put(ProductWooCommerceController());
+  ProductWooCommerceController controller =
+      Get.put(ProductWooCommerceController());
   Category? category;
-
+  ControllerAuthentication auth = Get.find();
   @override
   Widget build(BuildContext context) {
-    // controller.fetchCategories();
+    final String demoImage = "https://picsum.photos/250";
+    controller.fetchCategories();
     log("Categories = ${controller.categoryList.length}");
     return Scaffold(
       body: SizedBox(
         height: Get.height,
         width: Get.width,
         child: SafeArea(
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    CustomTextFieldSearch(
-                      width: Get.width * .75,
-                      hintText: 'Search',
-                      suffixIcon: Container(
-                        height: 20.h,
-                        width: 70,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(50),
-                          color: AppColors.buttonColor,
-                        ),
-                        child: Icon(
-                          Icons.search,
-                          color: Colors.white,
+          child: RefreshIndicator(
+            onRefresh: _onRefresh,
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      CustomTextFieldSearch(
+                        width: Get.width * .75,
+                        hintText: 'Search',
+                        suffixIcon: Container(
+                          height: 20.h,
+                          width: 70,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(50),
+                            color: AppColors.buttonColor,
+                          ),
+                          child: Icon(
+                            Icons.search,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
-                    ),
-                    InkWell(
-                      onTap: () {
-                        Get.to(() => LayoutCart(
-                          isHome: true,
-                        ));
-                      },
-                      child: CircleAvatar(
-                        radius: 23.r,
-                        backgroundColor: AppColors.buttonColor,
-                        child: SvgPicture.asset("assets/icons/icon_store.svg"),
-                      ).marginOnly(left: 5.w),
-                    ),
-                  ],
-                ).marginSymmetric(horizontal: 10),
-                buildTitle("Categories").marginOnly(top: 10.h, left: 25.w),
-
-                // Categories Section
-                controller.categoryList.isEmpty
-                    ? Center(child: Text("No categories available"))
-                    : SizedBox(
-                  height: 100.h, // Set height for the category section
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: controller.categoryList.length,
-                    itemBuilder: (context, index) {
-                      var category = controller.categoryList[index];
-                      return GestureDetector(
-                        onTap: () {
-                          if (category != null) {
-                            controller.selectCategory("${category.id ?? ''}");
-                            log("Category Name ${category.name}");
-                            Get.to(() => ProductsListScreen(categoryName: category.name));
-                          }
+                      InkWell(
+                        onTap: () async {
+                          Get.to(() => LayoutProfile());
+                         await auth.fetchUserIdByToken();
                         },
-                        child: buildCategoryItem(category).marginOnly(left: index == 0 ? 20.w : 10.w),
-                      );
-                    },
-                  ),
-                ),
+                        child: CircleAvatar(
+                          backgroundColor: Colors.white,
+                          radius: 25.r,
+                          backgroundImage: NetworkImage(demoImage),
+                        ).marginSymmetric(vertical: 6.h),
+                      ),
+                    ],
+                  ).marginSymmetric(horizontal: 10),
+                  buildTitle("Categories").marginOnly(top: 10.h, left: 25.w),
 
-                buildTitle("Sale Discount").marginOnly(top: 10.h, left: 25.w),
-                sampleSalesDiscount.isEmpty
+                  Obx(() {
+                    if (controller.isLoading.value) {
+                      return Center(child: CircularProgressIndicator());
+                    } else if (controller.categoryList.isEmpty) {
+                      return Center(child: Text("No categories available"));
+                    } else {
+                      return SizedBox(
+                        height: 100.h,
+                        child: ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          itemCount: controller.categoryList.length,
+                          itemBuilder: (context, index) {
+                            var category = controller.categoryList[index];
+                            return GestureDetector(
+                              onTap: () {
+                                if (category != null) {
+                                  controller.selectCategory(
+                                      "${category.id ?? ''}");
+                                  log("Category Name ${category.name}");
+                                  Get.to(() => ProductsListScreen(
+                                      categoryName: category.name));
+                                }
+                              },
+                              child: buildCategoryItem(category)
+                                  .marginOnly(
+                                  left: index == 0 ? 20.w : 10.w),
+                            );
+                          },
+                        ),
+                      );
+                    }
+                  }),
+
+              buildTitle("Sale Discount").marginOnly(top: 10.h, left: 25.w),
+              Obx(() {
+                return controller.filteredProductList.isEmpty
                     ? buildSkeletonList()
                     : Column(
-                  children: List.generate(sampleSalesDiscount.length, (index) {
-                    return buildSaleBannerItem(sampleSalesDiscount[index])
-                        .marginOnly(top: 10.h);
-                  }),
-                ),
-                SizedBox(height: 80),
-              ],
-            ).marginSymmetric(vertical: 10.h),
+                  children: List.generate(
+                    controller.filteredProductList.length,
+                        (index) {
+                      return buildSaleBannerItem(
+                          controller.filteredProductList[index], category)
+                          .marginOnly(top: 10.h);
+                    },
+                  ),
+                );
+              }),
+
+                  SizedBox(height: 80),
+                ],
+              ).marginSymmetric(vertical: 10.h),
+            ),
           ),
         ),
       ),
     );
   }
 
+  // Method to handle refresh
+  Future<void> _onRefresh() async {
+    controller.fetchCategories();
+    await Future.delayed(Duration(seconds: 1));
+  }
+
   // Category item widget
   Widget buildCategoryItem(Category category) {
     return Container(
-      width: 200.w, // Increased width
-      height: 200.h, // Increased height
-      padding: EdgeInsets.all(10.sp),
-      margin: EdgeInsets.symmetric(vertical: 10.h),
+      width: 200.w,
+      height: 250.h,
+      margin: EdgeInsets.symmetric(vertical: 5.h),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(15),
-        color: Colors.white.withOpacity(0), // Make the background transparent so the blur effect is visible
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 8,
-            offset: Offset(0, 4),
-          ),
-        ],
+        color: Colors.white.withOpacity(
+            0), // Make the background transparent so the blur effect is visible
       ),
       child: Stack(
         alignment: Alignment.center,
@@ -155,7 +160,8 @@ class LayoutHome extends StatelessWidget {
           ClipRRect(
             borderRadius: BorderRadius.circular(15),
             child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0), // Apply the blur effect to the background image
+              filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+              // Apply the blur effect to the background image
               child: Container(
                 decoration: BoxDecoration(
                   image: DecorationImage(
@@ -171,7 +177,8 @@ class LayoutHome extends StatelessWidget {
             category.name,
             style: TextStyle(
               fontWeight: FontWeight.bold,
-              color: Colors.white, // White text to stand out on the blurry background
+              color: Colors.white,
+              // White text to stand out on the blurry background
               fontSize: 16.sp,
               shadows: [
                 Shadow(
@@ -188,10 +195,16 @@ class LayoutHome extends StatelessWidget {
   }
 
   // Sale discount banner item widget
-  Widget buildSaleBannerItem(Product product) {
+  Widget buildSaleBannerItem(Product product, Category? category ) {
     return InkWell(
       onTap: () {
-        Get.to(ProductsScreen());
+        if (category != null) {
+          controller.selectCategory(
+              "${category.id ?? ''}");
+          log("Category Name ${category.name}");
+          Get.to(() => ProductsListScreen(
+              categoryName: category.name));
+        }
       },
       child: Container(
         width: Get.width - 40.w,
@@ -209,21 +222,32 @@ class LayoutHome extends StatelessWidget {
             ),
           ],
           image: DecorationImage(
-            image: NetworkImage(product.imageUrl),
+            image: NetworkImage(product.images![0].src ?? ''),
             fit: BoxFit.cover,
-            colorFilter: ColorFilter.mode(Colors.black.withOpacity(0.3), BlendMode.darken),
+            colorFilter: ColorFilter.mode(
+                Colors.black.withOpacity(0.3), BlendMode.darken),
           ),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
-            Text(
-              product.name,
-              style: TextStyle(fontSize: 18.sp, color: Colors.white, fontWeight: FontWeight.bold),
+            Align(
+              alignment: Alignment.centerRight,
+              child: Image.asset(
+                  height: 50.h,
+                  width: 50.w,
+                  "assets/images/new.png"),
             ),
             Text(
-              '\$${product.price.toStringAsFixed(2)}',
+              product.name!,
+              style: TextStyle(
+                  fontSize: 18.sp,
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold),
+            ),
+            Text(
+              '\$${product.price}',
               style: TextStyle(color: Colors.yellowAccent, fontSize: 16.sp),
             ),
           ],
@@ -233,13 +257,13 @@ class LayoutHome extends StatelessWidget {
   }
 
   Text buildTitle(String title) => Text(
-    title,
-    style: AppFontsStyle.introScrTitle.copyWith(
-      fontSize: 20.sp,
-      fontWeight: FontWeight.w900,
-      fontFamily: "AvenirBlack",
-    ),
-  );
+        title,
+        style: AppFontsStyle.introScrTitle.copyWith(
+          fontSize: 20.sp,
+          fontWeight: FontWeight.w900,
+          fontFamily: "AvenirBlack",
+        ),
+      );
 
   // Helper widget to build skeleton list
   Widget buildSkeletonList() {
@@ -261,31 +285,19 @@ class _FilterController extends GetxController {
   final List<String> colors = ["Red", "Blue", "Green", "Black", "White"];
 
   void addCategory(String category) {
-    selectedCategories.add(category);
-  }
-
-  void removeCategory(String category) {
-    selectedCategories.remove(category);
+    if (!selectedCategories.contains(category)) {
+      selectedCategories.add(category);
+    } else {
+      selectedCategories.remove(category);
+    }
   }
 
   void addColor(String color) {
-    selectedColors.add(color);
-  }
-
-  void removeColor(String color) {
-    selectedColors.remove(color);
+    if (!selectedColors.contains(color)) {
+      selectedColors.add(color);
+    } else {
+      selectedColors.remove(color);
+    }
   }
 }
 
-// Example Product class
-class Product {
-  final String name;
-  final double price;
-  final String imageUrl;
-
-  Product({
-    required this.name,
-    required this.price,
-    required this.imageUrl,
-  });
-}

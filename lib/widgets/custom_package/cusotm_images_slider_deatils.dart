@@ -49,11 +49,11 @@ class _SlidingImageContainerState extends State<SlidingImageContainer> {
                 controller: _pageController,
                 itemCount: widget.product.images!.length,
                 itemBuilder: (context, index) {
-                  final imageUrl = widget.product.images[index].src;
+                  final imageUrl = widget.product.images![index].src;
                   return Container(
                     child: Center(
                       child: CachedNetworkImage(
-                        imageUrl: imageUrl,
+                        imageUrl: imageUrl!,
                         fit: BoxFit.cover,
                         height: double.infinity,
                         placeholder: (context, url) => ImageSkeleton(

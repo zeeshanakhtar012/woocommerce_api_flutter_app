@@ -16,7 +16,8 @@ class ProductsListScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // productsController.fetchProductsByCategory(categoryName);
+    log("categoryName = $categoryName");
+    productsController.fetchProductsByCategory(categoryName);
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -74,16 +75,15 @@ class ProductsListScreen extends StatelessWidget {
                           final RegExp htmlTag = RegExp(r'<[^>]*>', multiLine: true, caseSensitive: true);
                           return htmlString.replaceAll(htmlTag, '').replaceAll('\n', ' ').trim();
                         }
-                        String plainTextDescription = stripHtml(product.description);
-
+                        String plainTextDescription = stripHtml(product.description!);
                         Get.to(() => ScreenProductDetails(
                           productId: product.id,
                           productDescription: plainTextDescription,
-                          productName: product.name,
+                          productName: product.name!,
                           productPrice: product.price.toString(),
                           sizes: ['S', 'M', 'L'],
                           colors: ['Red', 'Blue', 'Green'],
-                          productImages: product.images.map((image) => image.src).toList(),
+                          productImages: product.images!.map((image) => image.src!).toList(),
                         ));
                       },
                       child: Container(
@@ -102,11 +102,11 @@ class ProductsListScreen extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            product.images.isNotEmpty
+                            product.images!.isNotEmpty
                                 ? ClipRRect(
                               borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
                               child: Image.network(
-                                product.images[0].src,
+                                product.images![0].src!,
                                 height: 160,
                                 width: double.infinity,
                                 fit: BoxFit.cover,
@@ -147,7 +147,7 @@ class ProductsListScreen extends StatelessWidget {
                                         ),
                                       ),
                                       Text(
-                                        '(${product.categories[0].name ?? 'N/A'})',
+                                        '(${product.categories![0].name ?? 'N/A'})',
                                         style: TextStyle(
                                           fontSize: 12,
                                           color: Colors.grey.shade300,

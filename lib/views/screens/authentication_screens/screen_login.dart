@@ -18,7 +18,7 @@ class ScreenLogin extends StatelessWidget {
 
   final _formKey = GlobalKey<FormState>();
   final passwordError = "".obs;
-  ControllerAuthentication controller = Get.put(ControllerAuthentication());
+  final ControllerAuthentication controller = Get.put(ControllerAuthentication());
 
   @override
   Widget build(BuildContext context) {
@@ -29,16 +29,33 @@ class ScreenLogin extends StatelessWidget {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: SafeArea(
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              _buildHeader(),
-              _buildLoginForm(),
-              Spacer(),
-              _buildSignInButton(),
-            ],
-          ),
+        child: Stack(
+          children: [
+            Form(
+              key: _formKey,
+              child: Column(
+                children: [
+                  _buildHeader(),
+                  _buildLoginForm(),
+                  Spacer(),
+                  _buildSignInButton(),
+                ],
+              ),
+            ),
+            Obx(() {
+              if (controller.isLoading.value) {
+                return Container(
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.5),
+                  ),
+                  child: Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                );
+              }
+              return SizedBox.shrink();
+            }),
+          ],
         ),
       ),
     );
@@ -46,7 +63,6 @@ class ScreenLogin extends StatelessWidget {
 
   Widget _buildHeader() {
     return Container(
-      // height: 226.h,
       width: Get.width,
       padding: EdgeInsets.symmetric(vertical: 22.h),
       decoration: BoxDecoration(
@@ -74,15 +90,15 @@ class ScreenLogin extends StatelessWidget {
                 child: InkWell(
                   onTap: () => Get.to(ScreenSignUp()),
                   child: Text(
-                    'login_sign_up'.tr, // Use translation key here
+                    'login_sign_up'.tr,
                     style: AppFontsStyle.loginOption,
                   ),
                 ),
               ).marginOnly(bottom: 48.h),
-              Text('login_title'.tr, style: AppFontsStyle.logInTitle) // Use translation key
+              Text('login_title'.tr, style: AppFontsStyle.logInTitle)
                   .marginOnly(bottom: 11.h),
               Text(
-                'login_subtitle'.tr, // Use translation key
+                'login_subtitle'.tr,
                 textAlign: TextAlign.start,
                 style: AppFontsStyle.logInSubtitle.copyWith(
                   color: Colors.white,
@@ -103,45 +119,42 @@ class ScreenLogin extends StatelessWidget {
       children: [
         MyCostomTexttField(
           controller:controller.userName.value,
-          hint: 'UserName or Email'.tr, // Use translation key
-          // validator: FormValidator.validateEmail,
+          hint: 'UserName or Email'.tr,
         ).marginOnly(bottom: 10.h),
         MyCostomTexttField(
           controller:controller.password.value,
-          hint: 'login_password_hint'.tr, // Use translation key
+          hint: 'login_password_hint'.tr,
           isPasswordField: true,
-          validator: FormValidator.validatePassword,
         ),
         Text(
           passwordError.value,
           style: TextStyle(color: Colors.red),
         ),
-        Align(
-          alignment: Alignment.centerRight,
-          child: InkWell(
-            onTap: () => Get.to(ScreenEmail()),
-            child: Text(
-              'login_forgot_password'.tr, // Use translation key
-              style: TextStyle(color: Color(0xFFE41A4A), fontSize: 12.sp),
-            ),
-          ),
-        ).marginSymmetric(vertical: 6.sp),
+        // Align(
+        //   alignment: Alignment.centerRight,
+        //   child: InkWell(
+        //     onTap: () => Get.to(ScreenEmail()),
+        //     child: Text(
+        //       'login_forgot_password'.tr,
+        //       style: TextStyle(color: Color(0xFFE41A4A), fontSize: 12.sp),
+        //     ),
+        //   ),
+        // ).marginSymmetric(vertical: 6.sp),
       ],
     ).marginSymmetric(vertical: 30.h, horizontal: 32.w);
   }
 
   Widget _buildSignInButton() {
     return CustomButton(
-      // onTap: (){
-      //   Get.to(HomeScreen());
-      // },
       loading: controller.isLoading.value,
       onTap: () async {
         if (_formKey.currentState?.validate() ?? false) {
-          controller.signInUser();
+          controller.isLoading.value = true; // Show loading
+          await controller.signInUser();
+          controller.isLoading.value = false; // Hide loading after sign-in completes
         }
       },
-      text: 'login_sign_in'.tr, // Use translation key
+      text: 'login_sign_in'.tr,
       textColor: Colors.white,
       buttonColor: AppColors.buttonColor,
     ).marginSymmetric(horizontal: 32.w, vertical: 70.h);

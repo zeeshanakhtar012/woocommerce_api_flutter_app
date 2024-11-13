@@ -12,9 +12,8 @@ class LayoutCategory extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Fetch categories and products when the screen is loaded
     productsController.fetchCategories();
-
+    log("Categories fetched successfully ${productsController.categoryList}");
     return Scaffold(
       backgroundColor: AppColors.whiteColor,
       appBar: AppBar(
@@ -28,36 +27,53 @@ class LayoutCategory extends StatelessWidget {
       ),
       body: Column(
         children: [
-          // Fetch categories dynamically from the API and display them
           Expanded(
             child: Obx(() {
-              if (productsController.isLoading.value) {
-                return Center(child: CircularProgressIndicator());
-              }
-
-              if (productsController.categoryList.isEmpty) {
-                return Center(child: Text('No categories available'));
-              }
-
-              return ListView.builder(
-                itemCount: productsController.categoryList.length,
-                itemBuilder: (context, index) {
-                  final category = productsController.categoryList[index];
-                  return CustomImageCard(
-                    imagePath: category.image != null ? category.image! : 'assets/images/default_image.png', // Access image as a String
-                    title: category.name,  // Access name directly from Category
-                    onTap: () {
-                      productsController.selectCategory(category.id.toString());  // Access id directly
-                      log("Category Name ${category.name}");
-                      Get.to(() => ProductsListScreen(categoryName: category.name));  // Access name directly
-                    },
-                  );
+              return RefreshIndicator(
+                onRefresh: () async {
+                  return await Future.delayed(Duration(seconds: 2));
                 },
+                color: Colors.white,
+                backgroundColor: Colors.black,
+                child: productsController.isLoading.value
+                    ? Center(child: CircularProgressIndicator())
+                    : _buildCategoryList(),
               );
             }),
           ),
         ],
       ),
+    );
+  }
+
+  // Refresh function: Calls fetchCategories when user pulls down
+  Future<void> _onRefresh() async {
+    await Future.delayed(Duration(seconds: 2));
+    await productsController.fetchCategories();
+  }
+
+  // Builds the category list
+  Widget _buildCategoryList() {
+    if (productsController.categoryList.isEmpty) {
+      return Center(child: Text('No categories available'));
+    }
+
+    return ListView.builder(
+      itemCount: productsController.categoryList.length,
+      itemBuilder: (context, index) {
+        final category = productsController.categoryList[index];
+        return CustomImageCard(
+          imagePath: category.image != null
+              ? category.image!
+              : 'assets/images/default_image.png',
+          title: category.name,  // Access name directly from Category
+          onTap: () {
+            productsController.selectCategory(category.id.toString());
+            log("Category Name ${category.name}");
+            Get.to(() => ProductsListScreen(categoryName: category.name));
+          },
+        );
+      },
     );
   }
 }
@@ -85,9 +101,9 @@ class CustomImageCard extends StatelessWidget {
           color: Colors.white,
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.withOpacity(0.5),
-              spreadRadius: 4,
-              blurRadius: 4,
+              color: Colors.grey.withOpacity(0.07),
+              spreadRadius: 2,
+              blurRadius: 2,
               offset: Offset(0, 0), // changes position of shadow
             ),
           ],

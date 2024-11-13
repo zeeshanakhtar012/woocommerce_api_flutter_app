@@ -37,26 +37,17 @@ class ProductWooCommerceController extends GetxController {
   // Fetch categories from WooCommerce API
   Future<void> fetchCategories() async {
     try {
-      // Get the token from shared preferences
-      // SharedPreferences preferences = await SharedPreferences.getInstance();
-      // String? token = preferences.getString('token');
-      //
-      // if (token == null) {
-      //   return;  // Return early if no token exists
-      // }
-      //
-      // isLoading(true);
-
-      // Make the request with the Authorization header only, no need for consumer_key & secret
+      isLoading(true);
+      final String consumerKey = ConsumerId.consumerKey;
+      final String consumerSecret = ConsumerId.consumerSecret;
+      final String basicAuth = 'Basic ' + base64Encode(utf8.encode('$consumerKey:$consumerSecret'));
       final response = await http.get(
-        Uri.parse('https://zrjfashionstyle.com/wp-json/wc/v3/products/categories'),  // Updated endpoint without keys
+        Uri.parse('https://zrjfashionstyle.com/wp-json/wc/v3/products/categories'),
         headers: {
           'Content-Type': 'application/json',
-          // 'Authorization': 'Bearer $token',  // Bearer token authentication
+          'Authorization': basicAuth,
         },
       );
-
-      // Check for a successful response
       if (response.statusCode == 200) {
         String responseBody = response.body;
         if (responseBody.startsWith('JWT route is registered[')) {
@@ -108,13 +99,11 @@ class ProductWooCommerceController extends GetxController {
       isLoading.value = false;
     }
   }
-  // Select Category and fetch products
   void selectCategory(String categoryId) {
     selectedCategory.value = categoryId;
     fetchProductsByCategory(categoryId);
   }
 
-  // Toggle Category (for UI selection)
   void toggleCategory(String category) {
     if (selectedCategories.contains(category)) {
       selectedCategories.remove(category);
@@ -127,12 +116,11 @@ class ProductWooCommerceController extends GetxController {
     return selectedCategories.contains(category);
   }
 
-  // Fetch all products (for initial loading)
   Future<void> fetchAllProducts() async {
     try {
       isLoading(true);
       int page = 1;
-      int perPage = 50;  // Set the limit of products per request
+      int perPage = 50;
       List<Product> allProducts = [];
 
       do {
@@ -146,34 +134,27 @@ class ProductWooCommerceController extends GetxController {
         log('Response Status Code: ${response.statusCode}');
         log('Response Body: ${response.body}');
 
-        // Check if the response is valid (status code 200)
         if (response.statusCode == 200) {
           String responseBody = response.body;
-
-          // Clean the response body to remove any non-JSON content (like JWT message)
           if (responseBody.startsWith('JWT route is registered[')) {
-            responseBody = responseBody.substring(responseBody.indexOf('['));  // Extract only the valid JSON part
+            responseBody = responseBody.substring(responseBody.indexOf('['));
           }
-
-          // Parse the cleaned response body
           List<dynamic> data = json.decode(responseBody);
 
           log('Decoded Data: $data');
           if (data.isNotEmpty) {
             allProducts.addAll(data.map((json) => Product.fromJson(json)).toList());
-            page++;  // Increment page for the next request
+            page++;
           } else {
-            break;  // No more products to fetch
+            break;
           }
         } else {
           log('Failed to fetch products: ${response.statusCode}');
-          break;  // Exit if there is an error
+          break;
         }
       } while (true);
-
-      // Update observable list and filtered product list
       productList.value = allProducts;
-      filteredProductList.assignAll(productList);  // Show all products initially
+      filteredProductList.assignAll(productList);
 
     } catch (e) {
       log('Failed to fetch products: $e');
@@ -188,7 +169,7 @@ class ProductWooCommerceController extends GetxController {
       filteredProductList.assignAll(productList);  // Show all if query is empty
     } else {
       filteredProductList.assignAll(
-        productList.where((product) => product.name.toLowerCase().contains(query.toLowerCase())).toList(),
+        productList.where((product) => product.name!.toLowerCase().contains(query.toLowerCase())).toList(),
       );
     }
   }
@@ -232,5 +213,53 @@ class ProductWooCommerceController extends GetxController {
           .map((data) => Product.fromJson(data))
           .toList());
     }
+  }
+  // Save cart and wishlist to local storage
+  Future<void> saveCartAndWishlist() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('cartItems', jsonEncode(cartItems));
+    await prefs.setString('wishlistItems', jsonEncode(wishlistItems));
+  }
+
+  // Add product to cart
+  void addProductToCartLocal(Product product) {
+    if (!cartItems.contains(product)) {
+      cartItems.add(product);
+      saveCartAndWishlist();
+      log("Product added to cart!");
+      Get.snackbar('Success', 'Product added to cart!',
+          backgroundColor: Colors.green, colorText: Colors.white);
+    } else {
+      Get.snackbar('Info', 'Product already in cart.',
+          backgroundColor: Colors.blue, colorText: Colors.white);
+    }
+  }
+
+  // Remove product from cart
+  void removeProductFromCart(Product product) {
+    cartItems.remove(product);
+    saveCartAndWishlist();
+    Get.snackbar('Info', 'Product removed from cart.',
+        backgroundColor: Colors.orange, colorText: Colors.white);
+  }
+  // Add product to wishlist
+  void addProductToWishlist(Product product) {
+    if (!wishlistItems.contains(product)) {
+      wishlistItems.add(product);
+      saveCartAndWishlist();
+      Get.snackbar('Success', 'Product added to wishlist!',
+          backgroundColor: Colors.pink, colorText: Colors.white);
+    } else {
+      Get.snackbar('Info', 'Product already in wishlist.',
+          backgroundColor: Colors.blue, colorText: Colors.white);
+    }
+  }
+
+  // Remove product from wishlist
+  void removeProductFromWishlist(Product product) {
+    wishlistItems.remove(product);
+    saveCartAndWishlist();
+    Get.snackbar('Info', 'Product removed from wishlist.',
+        backgroundColor: Colors.orange, colorText: Colors.white);
   }
 }

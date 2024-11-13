@@ -53,6 +53,7 @@ class Assets {
   static const String imagesA533 = 'assets/images/a53_3.png';
   static const String imagesAnthony = 'assets/images/anthony.png';
   static const String imagesAppLogo = 'assets/images/app_logo.svg';
+  static const String imagesAppLogoPng = 'assets/images/app_logo_png.png';
   static const String imagesAppleWatchSeries71 = 'assets/images/apple_watch_series_7_1.png';
   static const String imagesAppleWatchSeries72 = 'assets/images/apple_watch_series_7_2.png';
   static const String imagesAppleWatchSeries73 = 'assets/images/apple_watch_series_7_3.png';
@@ -64,7 +65,7 @@ class Assets {
   static const String imagesDiscount = 'assets/images/discount.png';
   static const String imagesDressPng = 'assets/images/dress_png.png';
   static const String imagesEmptyCart = 'assets/images/empty_cart.png';
-  static const String imagesFinal = 'assets/images/final  ZRJ.png';
+  static const String imagesFinal  ZRJ = 'assets/images/final  ZRJ.png';
   static const String imagesGalaxyWatch41 = 'assets/images/galaxy_watch_4_1.png';
   static const String imagesGalaxyWatch42 = 'assets/images/galaxy_watch_4_2.png';
   static const String imagesGalaxyWatch43 = 'assets/images/galaxy_watch_4_3.png';
@@ -82,6 +83,8 @@ class Assets {
   static const String imagesLogo = 'assets/images/logo.png';
   static const String imagesMainBottom = 'assets/images/main_bottom.png';
   static const String imagesMainTop = 'assets/images/main_top.png';
+  static const String imagesNew = 'assets/images/new.png';
+  static const String imagesProduct1 = 'assets/images/Product_1.png';
   static const String imagesProfilePic = 'assets/images/profile_pic.png';
   static const String imagesSamsungQ60A1 = 'assets/images/samsung_q_60_a_1.png';
   static const String imagesSamsungQ60A2 = 'assets/images/samsung_q_60_a_2.png';
@@ -96,6 +99,8 @@ class Assets {
   static const String imagesTabS81 = 'assets/images/tab_s8_1.png';
   static const String imagesTabS82 = 'assets/images/tab_s8_2.png';
   static const String imagesTabS83 = 'assets/images/tab_s8_3.png';
+  static const String langEnUS = 'assets/lang/en_US.dart';
+  static const String langFrFR = 'assets/lang/fr_FR.dart';
   static const String latoLatoBlack = 'assets/fonts/Lato/Lato-Black.ttf';
   static const String latoLatoBlackItalic = 'assets/fonts/Lato/Lato-BlackItalic.ttf';
   static const String latoLatoBold = 'assets/fonts/Lato/Lato-Bold.ttf';
