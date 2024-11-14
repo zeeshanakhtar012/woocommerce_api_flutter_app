@@ -1,14 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:get/get.dart';
 import 'package:zrj/model/product.dart';
 import '../../constants/colors.dart';
 import '../../constants/fonts.dart';
 import '../../widgets/custom_button.dart';
 import '../../widgets/custom_package/cusotm_images_slider_deatils.dart';
-import '../layouts/layout_cart_tabs/screen_favourite_product.dart';
 
 class ScreenProductDetails extends StatelessWidget {
   final Product product;

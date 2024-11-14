@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:zrj/model/product.dart';
 import '../model/user.dart';
+import '../utils/wordpress_endpoints.dart';
 
 class PaymentsController extends GetxController {
   static const stripePublishableKey = "pk_test_51QK3OSKuV05bCvMeTcEqLo612iOCFZ8B3CG5BVRgG6nycWMX0VkhhZnaumh7W3uBTzyDdT7CNm8NjM8uF1yRgToW00IxYTH05s";
@@ -159,39 +160,22 @@ class PaymentsController extends GetxController {
     try {
       var headers = <String, String>{
         'Content-Type': 'application/json',
-        'Authorization': 'Basic ${base64Encode(utf8.encode('ck_your_consumer_key:cs_your_consumer_secret'))}',
+        'Authorization': 'Basic ${base64Encode(utf8.encode('${ConsumerId.consumerKey}:${ConsumerId.consumerSecret}'))}',
       };
+
+      // Ensure 'quantity' is included in productDetails
+      int quantity = int.tryParse(productDetails['quantity']?.toString() ?? '1') ?? 1;
 
       var orderData = {
         "payment_method": paymentInfo['method'],
         "payment_method_title": paymentInfo['method_title'],
         "set_paid": true,
-        "billing": {
-          "first_name": userDetails['first_name'],
-          "last_name": userDetails['last_name'],
-          "email": userDetails['email'],
-          "phone": userDetails['phone'],
-          "address_1": userDetails['address1'] ?? '',
-          "address_2": userDetails['address2'] ?? '',
-          "city": userDetails['city'] ?? '',
-          "state": userDetails['state'] ?? '',
-          "postcode": userDetails['postcode'] ?? '94103',
-          "country": userDetails['country'] ?? 'US'
-        },
-        "shipping": {
-          "first_name": userDetails['first_name'],
-          "last_name": userDetails['last_name'],
-          "address_1": userDetails['address1'] ?? '',
-          "address_2": userDetails['address2'] ?? '',
-          "city": userDetails['city'] ?? '',
-          "state": userDetails['state'] ?? '',
-          "postcode": userDetails['postcode'] ?? '94103',
-          "country": userDetails['country'] ?? 'US'
-        },
+        "billing": userDetails,
+        "shipping": userDetails,
         "line_items": [
           {
             "product_id": productDetails['id'],
-            "quantity": productDetails['quantity'],
+            "quantity": quantity,
             "total": productDetails['price'],
             "name": productDetails['name'],
           }
@@ -205,6 +189,8 @@ class PaymentsController extends GetxController {
         ]
       };
 
+      log('Order data to be sent: $orderData');  // Log the order data for debugging
+
       var response = await http.post(
         Uri.parse('https://zrjfashionstyle.com/wp-json/wc/v3/orders'),
         headers: headers,
@@ -214,17 +200,14 @@ class PaymentsController extends GetxController {
       if (response.statusCode == 201) {
         String cleanedResponse = response.body.replaceFirst('JWT route is registered', '');
         var responseBody = json.decode(cleanedResponse);
-
-        log('Order created successfully:');
-        log('Order ID: ${responseBody['id']}');
-        log('Status: ${responseBody['status']}');
-        log('Total: ${responseBody['total']} ${responseBody['currency']}');
+        log('Order created successfully with response: $responseBody');
       } else {
-        log('Failed to create order: ${response.body}');
+        log('Failed to create order with response: ${response.body}');
       }
     } catch (err) {
       log('Error creating WooCommerce order: $err');
       throw Exception("Failed to create order: $err");
     }
   }
+
 }

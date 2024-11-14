@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -6,6 +8,7 @@ import 'package:get/get.dart';
 import 'package:zrj/controllers/controller_payment.dart';
 import 'package:zrj/utils/firebase_utils.dart';
 import '../../constants/colors.dart';
+import '../../controllers/controller_authentication.dart';
 import '../../controllers/controller_product.dart';
 import '../../model/product.dart';
 import '../../model/user.dart';
@@ -40,7 +43,7 @@ class ScreenProductDetails extends StatefulWidget {
 class _ScreenProductDetailsState extends State<ScreenProductDetails> {
   final ProductWooCommerceController controller = Get.put(ProductWooCommerceController());
   PaymentsController paymentsController = Get.put(PaymentsController());
-
+  ControllerAuthentication authentication = Get.find();
   Color _selectedColor = Colors.red;
   String _selectedSize = 'S';
   int _quantity = 1;
@@ -52,6 +55,12 @@ class _ScreenProductDetailsState extends State<ScreenProductDetails> {
     } catch (e) {
       return '0.00';
     }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUsrDetails();
   }
 
   void _increaseQuantity() {
@@ -67,6 +76,20 @@ class _ScreenProductDetailsState extends State<ScreenProductDetails> {
       });
     }
   }
+
+  void _fetchUsrDetails() async {
+    try {
+      if (widget.user != null && widget.user!.id != null) {
+        authentication.fetchUserDetailsById(widget.user!.id!);
+        log("${widget.user!.id}");
+      } else {
+        authentication.fetchUserIdByToken();
+        log("${widget.user!.id}");
+      }
+    }catch(t){
+      log("$t");
+    }
+    }
 
   @override
   Widget build(BuildContext context) {
@@ -143,7 +166,7 @@ class _ScreenProductDetailsState extends State<ScreenProductDetails> {
                 // dateModified: widget.product?.dateModified ?? DateTime.now(),
                 // dateModifiedGmt: widget.product?.dateModifiedGmt ?? DateTime.now(),
               );
-
+              log("Product details /// $product");
               // Initialize billing and shipping with null checks
               Billing billing = Billing(
                 phone: widget.user?.billing?.phone ?? "N/A",
@@ -172,7 +195,7 @@ class _ScreenProductDetailsState extends State<ScreenProductDetails> {
                 shipping: shipping,
                 isPayingCustomer: true,
               );
-
+              log("User data /// : $user");
               // Call the payment controller
               paymentsController.makePayment(
                 getTotalPrice(),

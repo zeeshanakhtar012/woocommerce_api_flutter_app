@@ -3,8 +3,10 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:zrj/constants/colors.dart';
 import 'package:zrj/views/screens/screen_products_details.dart';
 import '../../controllers/controller_product.dart';
+import '../../controllers/favourite_controller.dart';
 import '../../model/product.dart';
 
 class ProductsListScreen extends StatelessWidget {
@@ -12,7 +14,10 @@ class ProductsListScreen extends StatelessWidget {
 
   ProductsListScreen({required this.categoryName});
 
-  final ProductWooCommerceController productsController = Get.put(ProductWooCommerceController());
+  final ProductWooCommerceController productsController =
+      Get.put(ProductWooCommerceController());
+  final FavoritesController favoritesController =
+      Get.put(FavoritesController());
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +34,7 @@ class ProductsListScreen extends StatelessWidget {
           },
           child: CircleAvatar(
             radius: 10.r,
-            backgroundColor: Colors.red,
+            backgroundColor: AppColors.appRedColor,
             child: Icon(Icons.arrow_back, color: Colors.white),
           ).marginSymmetric(
             horizontal: 10.sp,
@@ -54,11 +59,13 @@ class ProductsListScreen extends StatelessWidget {
               }
 
               if (productsController.filteredProductList.isEmpty) {
-                return Center(child: Text('No products available in this category'));
+                return Center(
+                    child: Text('No products available in this category'));
               }
 
               return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
                 child: GridView.builder(
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2,
@@ -68,23 +75,32 @@ class ProductsListScreen extends StatelessWidget {
                   ),
                   itemCount: productsController.filteredProductList.length,
                   itemBuilder: (context, index) {
-                    final Product product = productsController.filteredProductList[index];
+                    final Product product =
+                        productsController.filteredProductList[index];
                     return InkWell(
                       onTap: () {
                         String stripHtml(String htmlString) {
-                          final RegExp htmlTag = RegExp(r'<[^>]*>', multiLine: true, caseSensitive: true);
-                          return htmlString.replaceAll(htmlTag, '').replaceAll('\n', ' ').trim();
+                          final RegExp htmlTag = RegExp(r'<[^>]*>',
+                              multiLine: true, caseSensitive: true);
+                          return htmlString
+                              .replaceAll(htmlTag, '')
+                              .replaceAll('\n', ' ')
+                              .trim();
                         }
-                        String plainTextDescription = stripHtml(product.description!);
+
+                        String plainTextDescription =
+                            stripHtml(product.description!);
                         Get.to(() => ScreenProductDetails(
-                          productId: product.id,
-                          productDescription: plainTextDescription,
-                          productName: product.name!,
-                          productPrice: product.price.toString(),
-                          sizes: ['S', 'M', 'L'],
-                          colors: ['Red', 'Blue', 'Green'],
-                          productImages: product.images!.map((image) => image.src!).toList(),
-                        ));
+                              productId: product.id,
+                              productDescription: plainTextDescription,
+                              productName: product.name!,
+                              productPrice: product.price.toString(),
+                              sizes: ['S', 'M', 'L'],
+                              colors: ['Red', 'Blue', 'Green'],
+                              productImages: product.images!
+                                  .map((image) => image.src!)
+                                  .toList(),
+                            ));
                       },
                       child: Container(
                         decoration: BoxDecoration(
@@ -104,24 +120,27 @@ class ProductsListScreen extends StatelessWidget {
                           children: [
                             product.images!.isNotEmpty
                                 ? ClipRRect(
-                              borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
-                              child: Image.network(
-                                product.images![0].src!,
-                                height: 160,
-                                width: double.infinity,
-                                fit: BoxFit.cover,
-                              ),
-                            )
+                                    borderRadius: BorderRadius.vertical(
+                                        top: Radius.circular(12)),
+                                    child: Image.network(
+                                      product.images![0].src!,
+                                      height: 160,
+                                      width: double.infinity,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  )
                                 : Container(
-                              height: 160,
-                              decoration: BoxDecoration(
-                                color: Colors.grey[200],
-                                borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
-                              ),
-                              child: Icon(Icons.image, size: 80, color: Colors.grey[400]),
-                            ),
+                                    height: 10,
+                                    decoration: BoxDecoration(
+                                      color: Colors.grey[200],
+                                      borderRadius: BorderRadius.vertical(
+                                          top: Radius.circular(12)),
+                                    ),
+                                    child: Icon(Icons.image,
+                                        size: 80, color: Colors.grey[400]),
+                                  ),
                             Padding(
-                              padding: const EdgeInsets.all(8.0),
+                              padding: const EdgeInsets.all(6.0),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
@@ -156,6 +175,25 @@ class ProductsListScreen extends StatelessWidget {
                                       ),
                                     ],
                                   ),
+                                  Obx(() {
+                                    bool isFavorite = favoritesController
+                                        .isFavorite(product.id!);
+                                    return Align(
+                                      alignment: Alignment.bottomRight,
+                                      child: IconButton(
+                                        icon: Icon(
+                                          isFavorite
+                                              ? Icons.favorite
+                                              : Icons.favorite_border,
+                                          color: isFavorite
+                                              ? Colors.red
+                                              : AppColors.appRedColor,
+                                        ),
+                                        onPressed: () => favoritesController
+                                            .toggleFavorite(product.id!),
+                                      ),
+                                    );
+                                  }),
                                 ],
                               ),
                             ),
