@@ -67,8 +67,11 @@ class LayoutHome extends StatelessWidget {
                       ),
                       InkWell(
                         onTap: () async {
-                          Get.to(() => LayoutProfile());
-                         await auth.fetchUserDetailsById();
+                         await auth.getUserId();
+                          await auth.fetchUserDetailsById();
+                          // log("user details ${fetch}");
+                          // Get.to(() => LayoutProfile());
+                         // await auth.fetchUserDetailsById();
                         },
                         child: CircleAvatar(
                           backgroundColor: Colors.white,

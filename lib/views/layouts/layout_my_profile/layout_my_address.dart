@@ -81,7 +81,7 @@ class LayoutAddress extends StatelessWidget {
                   CustomButton(
                     loading: controller.isLoading.value,
                     onTap: () async {
-                     await controller.updateUserDetails("${userId}");
+                     await controller.updateUserDetails(userId);
                     },
                     text: "ADD ADDRESS",
                     textColor: Colors.white,

@@ -161,22 +161,36 @@ class _ScreenProductDetailsState extends State<ScreenProductDetails> {
         padding: const EdgeInsets.all(8.0),
         child: ElevatedButton(
           onPressed: () async {
-            if (widget.productId != null) {
-              final String? userId = await authentication.getUserId();
+            // Ensure the productId is not null before proceeding
+            if (widget.productId == null) {
+              log("Product ID is null.");
+              Get.snackbar(
+                'Error',
+                'Product details are missing.',
+                snackPosition: SnackPosition.BOTTOM,
+                backgroundColor: Colors.red,
+                colorText: Colors.white,
+                duration: Duration(seconds: 2),
+              );
+              return;
+            }
+
+            try {
+              // Construct the Product object with safe null checks
               Product product = Product(
                 id: widget.productId!,
                 name: widget.productName ?? "N/A",
-                price: "${widget.productPrice}" ,
+                price: widget.productPrice ?? "0.0",
                 description: widget.productDescription ?? "N/A",
                 size: (widget.sizes != null && widget.sizes!.isNotEmpty) ? widget.sizes![0] : "N/A",
-                images: widget.productImages != null
-                    ? widget.productImages!.map((url) => ProductImage(src: url)).toList()
-                    : [],
+                images: widget.productImages?.map((url) => ProductImage(src: url)).toList() ?? [],
                 color: (widget.colors != null && widget.colors!.isNotEmpty) ? widget.colors![0] : "N/A",
                 slug: widget.product?.slug ?? "default-slug",
                 permalink: widget.product?.permalink ?? "default-permalink",
               );
-              log("Product details $product");
+              log("Product details: $product");
+
+              // Construct the Billing object with safe null checks
               Billing billing = Billing(
                 phone: widget.user?.billing?.phone ?? "N/A",
                 address2: widget.user?.billing?.address2 ?? "N/A",
@@ -186,14 +200,30 @@ class _ScreenProductDetailsState extends State<ScreenProductDetails> {
                 country: widget.user?.shipping?.country ?? "N/A",
               );
 
+              // Construct the Shipping object with safe null checks
               Shipping shipping = Shipping(
                 address1: widget.user?.shipping?.address1 ?? "N/A",
                 city: widget.user?.shipping?.city ?? "N/A",
                 state: widget.user?.shipping?.state ?? "N/A",
                 country: widget.user?.shipping?.country ?? "N/A",
               );
+
+              // Ensure user is not null before accessing its fields
+              if (widget.user == null) {
+                log("User details are missing.");
+                Get.snackbar(
+                  'Error',
+                  'User details are missing.',
+                  snackPosition: SnackPosition.BOTTOM,
+                  backgroundColor: Colors.red,
+                  colorText: Colors.white,
+                  duration: Duration(seconds: 2),
+                );
+                return;
+              }
+
               UserModel user = UserModel(
-                id: userId,
+                id: widget.user!.id ?? 0,
                 firstName: widget.user?.firstName ?? "John",
                 lastName: widget.user?.lastName ?? "Doe",
                 email: widget.user?.email ?? "example@example.com",
@@ -202,70 +232,39 @@ class _ScreenProductDetailsState extends State<ScreenProductDetails> {
                 shipping: shipping,
                 isPayingCustomer: true,
               );
-              log("User data : $user");
-              log("User Id : ${user.id}");
+
+              log("User data: $user");
+
               // Call the payment controller
               paymentsController.makePayment(
                 getTotalPrice(),
                 product,
                 user,
                 onSuccess: (infoData) {
-                  print("Payment successful: $infoData");
+                  log("Payment successful: $infoData");
                   Get.snackbar('Success', 'Your order has been placed.');
                 },
                 onError: (error) {
-                  print("Payment failed: $error");
+                  log("Payment failed: $error");
                   Get.snackbar('Error', 'Payment failed. Please try again.');
                 },
               );
-            } else {
-              print('Product ID is null');
+            } catch (e) {
+              log("An error occurred: $e");
+              Get.snackbar(
+                'Error',
+                'Something went wrong. Please try again.',
+                snackPosition: SnackPosition.BOTTOM,
+                backgroundColor: Colors.red,
+                colorText: Colors.white,
+                duration: Duration(seconds: 2),
+              );
             }
           },
-//           onPressed: () async {
-//             // Check for productId and the necessary fields
-//             if (widget.productId == null || widget.productPrice.isEmpty || widget.productName.isEmpty) {
-//               log("Product details are missing.");
-//               Get.snackbar(
-//                 snackPosition: SnackPosition.BOTTOM,
-//                 backgroundColor: Colors.red,
-//                 colorText: Colors.white,
-//                 duration: Duration(seconds: 2),
-//                 'Error', 'Product details are missing.',
-//               );
-//               return;
-//             }
-//
-//             // Create a list of ProductImage objects from widget.productImages (which is likely a list of image URLs)
-//             List<ProductImage> productImages = widget.productImages.isNotEmpty
-//                 ? widget.productImages.map((url) => ProductImage(src: url)).toList()  // Convert strings to ProductImage objects
-//                 : [];  // Empty list if no images
-//
-// // Create product with the images
-//             final product = Product(
-//               id: widget.productId ?? 0,
-//               name: widget.productName ?? 'Unknown Product',
-//               price: widget.productPrice ?? '0.0',
-//               quantity: _quantity,
-//               color: _selectedColor.toString(),
-//               size: _selectedSize,
-//               images: productImages,
-//             );
-//             // Add product to the cart
-//             cartController.addProductToCart(product);
-//
-//             // Show success message
-//             Get.snackbar(
-//               'Success',
-//               '${product.name} has been added to the cart!',
-//               snackPosition: SnackPosition.BOTTOM,
-//               backgroundColor: Colors.green,
-//               colorText: Colors.white,
-//               duration: Duration(seconds: 2),
-//             );
-//             log("Product added to cart successfully.");
-//           },
-          child: Text('Order Now', style: TextStyle(color: Colors.white, fontSize: 16.sp)),
+          child: Text(
+            'Order Now',
+            style: TextStyle(color: Colors.white, fontSize: 16.sp),
+          ),
           style: ElevatedButton.styleFrom(
             backgroundColor: AppColors.buttonColor,
             padding: EdgeInsets.symmetric(vertical: 15),
