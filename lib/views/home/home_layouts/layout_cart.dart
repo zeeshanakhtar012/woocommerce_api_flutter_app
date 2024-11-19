@@ -1,14 +1,10 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import '../../../constants/colors.dart';
-import '../../../constants/fonts.dart';
-import '../../../controllers/controller_product.dart';
-import '../../../widgets/custom_listview_builder.dart';
-import '../../../widgets/skeleton/custom_skeleton.dart/cart_skeleton.dart';
-import '../../screens/screen_test.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:zrj/controllers/controller_cart.dart';
+import 'package:zrj/model/product.dart';
+import 'package:zrj/widgets/cart_item_widget.dart';
+
 class LayoutCart extends StatefulWidget {
   final bool isHome;
 
@@ -19,65 +15,102 @@ class LayoutCart extends StatefulWidget {
 }
 
 class _LayoutCartState extends State<LayoutCart> {
+  final CartController cartController = Get.put(CartController());
+  List<int> selectedProductIds = [];  // Track selected products
 
-  ProductWooCommerceController controller = Get.put(ProductWooCommerceController());
+  // Calculate the total price of selected products
+  double calculateTotalPrice() {
+    double total = 0;
+    for (var product in cartController.cartItems) {
+      if (selectedProductIds.contains(product.id)) {
+        // Parse the price from String to double, and quantity to int.
+        total += (double.tryParse(product.price ?? '0') ?? 0) * (product.quantity?.toInt() ?? 1);
+      }
+    }
+    return total;
+  }
+  // Handle product selection and deselection
+  void toggleProductSelection(int productId, bool isSelected) {
+    setState(() {
+      if (isSelected) {
+        selectedProductIds.add(productId);  // Add to selection
+      } else {
+        selectedProductIds.remove(productId);  // Remove from selection
+      }
+    });
+  }
+
+  // Handle removal of selected products
+  void removeSelectedProducts() async {
+    for (var productId in selectedProductIds) {
+      await cartController.removeProductFromCart(productId);
+    }
+    setState(() {
+      selectedProductIds.clear(); // Clear the selected products after removal
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    log("Cart Items are ${controller.cartItems}");
     return Scaffold(
-      backgroundColor: AppColors.whiteColor,
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: AppColors.whiteColor,
-        elevation: 0,
-        title: Text(
-          "MY Cart",
-          style: AppFontsStyle.profileAppBar,
+        leading: IconButton(
+          onPressed: () => Get.back(),
+          icon: Icon(Icons.arrow_back, color: Colors.white),
         ),
+        backgroundColor: Colors.blue,
+        title: Text("My Cart"),
         centerTitle: true,
         actions: [
           TextButton(
-            onPressed: () {},
-            child: Text(
-              "Clear Cart",
-              style: TextStyle(
-                color: Colors.red,
-                fontSize: 14.sp,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
+            onPressed: () async {
+              await cartController.clearCart();
+              setState(() {}); // Reload cart after clearing
+            },
+            child: Text("Clear Cart"),
           ),
         ],
       ),
       body: SafeArea(
-        child: SizedBox(
-          height: Get.height,
-          child: Stack(
-            children: [
-              Positioned(
-                top: 0.h,
-                left: 132.w,
-                right: 91.w,
-                child: AnimatedSvg(
-                  svgAssetPath: "assets/icons/home_line.svg",
-                  color: Colors.black.withOpacity(.2),
-                ),
+        child: Column(
+          children: [
+            Expanded(
+              child: ListView.builder(
+                itemCount: cartController.cartItems.length,
+                itemBuilder: (context, index) {
+                  Product product = cartController.cartItems[index];
+                  return CartItemWidget(
+                    product: product,
+                    onSelectionChanged: toggleProductSelection,
+                  );
+                },
               ),
-              Positioned(
-                left: 0,
-                right: 0,
-                top: 0,
-                bottom: 0,
-                child: CustomListviewBuilder(
-                  scrollDirection: CustomDirection.vertical,
-                  itemCount: 3,
-                  itemBuilder: (context, index) {
-                    return CartSkeleton();
-                  },
-                ),
+            ),
+            Padding(
+              padding: EdgeInsets.all(16.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text("Total: \$${calculateTotalPrice().toStringAsFixed(2)}"),
+                  ElevatedButton(
+                    onPressed: () {
+                      // Handle Order Now action
+                      // Get.to(YourOrderScreen());
+                    },
+                    child: Text("Order Now"),
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+            Padding(
+              padding: EdgeInsets.all(16.0),
+              child: ElevatedButton(
+                onPressed: removeSelectedProducts,
+                child: Text("Remove Selected Products"),
+              ),
+            ),
+          ],
         ),
       ),
     );

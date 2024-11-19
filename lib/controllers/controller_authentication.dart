@@ -3,8 +3,10 @@ import 'dart:developer';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
+import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../model/user.dart';
+import '../model/user_model.dart';
 import '../utils/firebase_utils.dart';
 import '../utils/wordpress_endpoints.dart';
 import '../views/home/home_screen.dart';
@@ -25,8 +27,8 @@ class ControllerAuthentication extends GetxController {
   var address = TextEditingController().obs;
   final Map<String, String> billing = {};
   final Map<String, String> shipping = {};
-  var userId = 0.obs;
   var userDisplayName = ''.obs;
+  var user = Rx<User?>(null);
 
   final String consumerKey = ConsumerId.consumerKey;
   final String consumerSecret = ConsumerId.consumerSecret;
@@ -73,18 +75,25 @@ class ControllerAuthentication extends GetxController {
         final data = jsonDecode(responseBody);
         int userId = data['id'];
         final String? token = await getToken();
-        FirebaseUtils.showSuccess('User created successfully');
-        log('User created: $userId');
-        saveUserId(userId);
-        saveToken(token!);
-        _saveUserDetails(
-          email.value.text,
-          userName.value.text,
-          userDisplayName.value,
-          token,
-          // userId,
-        );
-        Get.offAll(HomeScreen());
+
+        // Check if token is null
+        if (token != null) {
+          FirebaseUtils.showSuccess('User created successfully');
+          log('User created: $userId');
+          saveUserId(userId);
+          saveToken(token); // Only save token if it's not null
+          _saveUserDetails(
+            email.value.text,
+            userName.value.text,
+            userDisplayName.value,
+            token,
+            // userId,
+          );
+          Get.offAll(HomeScreen());
+        } else {
+          FirebaseUtils.showError('Token is null. User creation failed.');
+          log('Error: Token is null');
+        }
       } else {
         FirebaseUtils.showError('Failed to create user');
         log('Failed to create user: ${response.body}');
@@ -95,6 +104,11 @@ class ControllerAuthentication extends GetxController {
     } finally {
       isLoading(false); // End loading
     }
+  }
+  // save user id from the sign up
+  Future<void> saveUserId(int userId) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setInt("userId", userId);
   }
   // update user details
   Future<void> updateUserDetails(String userId) async {
@@ -169,13 +183,10 @@ class ControllerAuthentication extends GetxController {
       log('Response body: ${response.body}');
 
       if (response.statusCode == 200) {
-        // Clean up unwanted text if present before decoding JSON
         String responseBody = response.body;
         if (responseBody.contains("JWT route is registered")) {
           responseBody = responseBody.replaceFirst("JWT route is registered", "");
         }
-
-        // Decode JSON response
         final data = jsonDecode(responseBody);
         final token = data['token'];
         final userName = data['user_nicename'];
@@ -187,7 +198,7 @@ class ControllerAuthentication extends GetxController {
         // log('User Nicename: $userName');
         // fetchUserIdByToken();
         saveToken(token);
-        fetchUserIdByToken();
+        // fetchUserIdByToken();
         // Verify token format and navigate to home screen
         if (token != null && token.split('.').length == 3) {
           _saveUserDetails(
@@ -208,7 +219,56 @@ class ControllerAuthentication extends GetxController {
     }
   }
   // save user details
-  fetchUserDetailsById(int userId) async {
+  Future<User> fetchUserDetails() async {
+    // Retrieve the userId from local storage
+    final String? userIdString = await getUserId();
+
+    // Ensure the userIdString is not null and convert it to an int
+    if (userIdString == null) {
+      throw Exception('User ID not found');
+    }
+
+    // Convert the userIdString to an integer
+    final int userId = int.parse(userIdString); // Convert the String to int
+
+    final String url = 'https://zrjfashionstyle.com/wp-json/wc/v3/customers/$userId';
+
+    // Send the HTTP GET request
+    final response = await http.get(Uri.parse(url));
+
+    log('response ${response.body}');
+    if (response.statusCode == 200) {
+      // Clean the response if it has unwanted text at the start
+      String cleanResponse = response.body.replaceFirst('JWT route is registered{', '{');
+      final Map<String, dynamic> jsonResponse = jsonDecode(cleanResponse);
+      return User.fromJson(jsonResponse); // Convert the cleaned JSON response to a UserModel
+    } else {
+      throw Exception('Failed to load user details');
+    }
+  }
+  // user by id
+  Future<void> fetchUserDetailsById() async {
+    String? userId = await getUserId();
+    // String? token = await getToken();
+    log("User id == $userId");
+    // log("token ==  $token");
+    // if (token == null || token.isEmpty) {
+    //   log("No token found.");
+    //   return null;
+    // }
+
+    if (userId == null || userId.isEmpty) {
+      log('Error: User ID is null or empty');
+      FirebaseUtils.showError('User ID is missing');
+      return;
+    }
+
+    // if (token == null || token.isEmpty) {
+    //   log('Error: Token is null or empty');
+    //   FirebaseUtils.showError('Authentication token is missing');
+    //   return;
+    // }
+
     final url = Uri.parse("https://zrjfashionstyle.com/wp-json/wc/v3/customers/$userId");
 
     try {
@@ -216,7 +276,7 @@ class ControllerAuthentication extends GetxController {
         url,
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer $getToken',  // Add token in the header
+          // 'Authorization': 'Bearer $token',
         },
       );
 
@@ -225,9 +285,12 @@ class ControllerAuthentication extends GetxController {
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         UserModel user = UserModel.fromJson(data);
-        await _saveUserProfile(user);
+        // await _saveUserProfile(user);
         FirebaseUtils.showSuccess('User details fetched successfully!');
         log('User details: $user');
+      } else if (response.statusCode == 403) {
+        FirebaseUtils.showError('Authentication failed: Invalid token');
+        log('Error: Invalid token');
       } else {
         FirebaseUtils.showError('Failed to fetch user details');
         log('Error: ${response.body}');
@@ -244,24 +307,82 @@ class ControllerAuthentication extends GetxController {
     print("Retrieved Token: $token");
     return token;
   }
-  Future<UserModel?> fetchUserIdByToken() async {
-      String? token = await getToken();
-      log("User JWT Token : $token");
-      final response = await http.get(
-        Uri.parse('https://zrjfashionstyle.com/wp-json/wp/v2/users/me'),
-        headers: {
-          'Authorization': 'Bearer $token',
-        },
-      );
-      log(" User ID Response : ${response.body}");
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        return UserModel.fromJson(data);
+  // get id by extracting user JWT token to
+  // Future<UserModel?> fetchUserIdByToken() async {
+  //   try {
+  //     // Get the JWT token
+  //     String? token = await getToken();
+  //     if (token == null || token.isEmpty) {
+  //       log("No token found.");
+  //       return null;
+  //     }
+  //
+  //     log("User JWT Token: $token");
+  //
+  //     // Decode the JWT token
+  //     Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
+  //     log("Decoded JWT Token: $decodedToken");
+  //
+  //     // Extract user ID from nested structure
+  //     final userData = decodedToken['data']?['user'];
+  //     if (userData == null || !userData.containsKey('id')) {
+  //       log("User ID not found in token.");
+  //       return null;
+  //     }
+  //     final userId = userData['id'];
+  //     log("Extracted User ID from Token: $userId");
+  //
+  //     // Save user ID to local storage
+  //     final prefs = await SharedPreferences.getInstance();
+  //     await prefs.setString('userId', userId.toString());
+  //     log("User ID saved to local storage: $userId");
+  //
+  //     // Fetch user details from the API
+  //     final response = await http.get(
+  //       Uri.parse('https://zrjfashionstyle.com/wp-json/wp/v2/users/me'),
+  //       headers: {
+  //         'Authorization': 'Bearer $token',
+  //       },
+  //     );
+  //
+  //     log("User API Response: ${response.body}");
+  //
+  //     if (response.statusCode == 200) {
+  //       // Remove the "JWT route is registered" prefix if present
+  //       String responseBody = response.body;
+  //       if (responseBody.startsWith("JWT route is registered")) {
+  //         responseBody = responseBody.replaceFirst("JWT route is registered", "").trim();
+  //       }
+  //
+  //       // Parse the cleaned JSON
+  //       final data = jsonDecode(responseBody);
+  //       return UserModel.fromJson(data);
+  //     } else {
+  //       log('Failed to retrieve user details. Status code: ${response.statusCode}');
+  //       return null;
+  //     }
+  //   } catch (e) {
+  //     log("Error in fetchUserIdByToken: $e");
+  //     return null;
+  //   }
+  // }
+  // get user id extracted from the JWT token
+  Future<String?> getUserId() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final userId = prefs.getString('userId');
+      if (userId != null) {
+        log("Retrieved User ID from local storage: $userId");
+        return userId;
       } else {
-        print('Failed to retrieve user details. Status code: ${response.statusCode}');
+        log("No User ID found in local storage.");
         return null;
       }
+    } catch (e) {
+      log("Error retrieving User ID: $e");
+      return null;
     }
+  }
   // Save user details to SharedPreferences
   Future<void> _saveUserDetails(String userEmail, String userNiceName, String userDisplayName, String token) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -270,12 +391,9 @@ class ControllerAuthentication extends GetxController {
     await prefs.setString('user_nicename', userNiceName);
     await prefs.setString('user_display_name', userDisplayName);
   }
-
   // Save user profile to SharedPreferences
   Future<void> _saveUserProfile(UserModel user) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-
-    prefs.setInt('userId', user.id!);
     prefs.setString('firstName', user.firstName!);
     prefs.setString('lastName', user.lastName!);
     prefs.setString('email', user.email!);
@@ -291,18 +409,6 @@ class ControllerAuthentication extends GetxController {
     prefs.setString('shippingState', user.shipping!.state!);
     prefs.setString('shippingCountry', user.shipping!.country!);
   }
-
-  // Save the user ID in SharedPreferences
-  Future<void> saveUserId(int userId) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setInt('id', userId); // Use setInt to save the userId
-  }
-
-  Future<int?> getUserId() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    return prefs.getInt('id');
-  }
-
   // Save token in SharedPreferences
   void saveToken(String token) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -317,6 +423,7 @@ class ControllerAuthentication extends GetxController {
       'profile_image': prefs.getString('profile_image'),
     };
   }
+  // is user authenticated
   Future<bool> isAuthenticated() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('token');

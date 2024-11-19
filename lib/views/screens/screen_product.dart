@@ -175,25 +175,6 @@ class ProductsListScreen extends StatelessWidget {
                                       ),
                                     ],
                                   ),
-                                  Obx(() {
-                                    bool isFavorite = favoritesController
-                                        .isFavorite(product.id!);
-                                    return Align(
-                                      alignment: Alignment.bottomRight,
-                                      child: IconButton(
-                                        icon: Icon(
-                                          isFavorite
-                                              ? Icons.favorite
-                                              : Icons.favorite_border,
-                                          color: isFavorite
-                                              ? Colors.red
-                                              : AppColors.appRedColor,
-                                        ),
-                                        onPressed: () => favoritesController
-                                            .toggleFavorite(product.id!),
-                                      ),
-                                    );
-                                  }),
                                 ],
                               ),
                             ),

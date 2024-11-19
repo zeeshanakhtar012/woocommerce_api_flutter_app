@@ -2,69 +2,71 @@ import 'dart:convert';
 
 import 'package:zrj/model/category.dart';
 
+import 'model_images.dart';
+
 class Product {
-  final int? id;
-  final String? name;
-  final String? slug;
-  final String? permalink;
-  final String? dateCreated;
-  final String? dateCreatedGmt;
-  final String? dateModified;
-  final String? dateModifiedGmt;
-  final String? type;
-  final String? status;
-  final bool? featured;
-  final String? catalogVisibility;
-  final String? description;
-  final String? shortDescription;
-  final String? sku;
-  final String? price;
-  final String? regularPrice;
-  final String? salePrice;
-  final bool? onSale;
-  final bool? purchasable;
-  final String? totalSales;
-  final bool? virtual;
-  final bool? downloadable;
-  final List<dynamic>? downloads;
-  final int? downloadLimit;
-  final int? downloadExpiry;
-  final String? externalUrl;
-  final String? buttonText;
-  final String? taxStatus;
-  final String? taxClass;
-  final bool? manageStock;
-  final int? stockQuantity;
-  final String? backorders;
-  final bool? backordersAllowed;
-  final bool? backordered;
-  final int? lowStockAmount;
-  final bool? soldIndividually;
-  final String? weight;
-  final Map<String, String>? dimensions;
-  final bool? shipping;
-  final bool? shippingTaxable;
-  final String? shippingClass;
-  final int? shippingClassId;
-  final bool? reviewsAllowed;
-  final String? averageRating;
-  final int? ratingCount;
-  final List<int>? upsellIds;
-  final List<int>? crossSellIds;
-  final int? parentId;
-  final String? purchaseNote;
-  final List<Category>? categories;
-  final List<dynamic>? tags;
-  final List<ProductImage>? images;
-  final List<Attribute>? attributes;
-  final List<dynamic>? defaultAttributes;
-  final List<dynamic>? variations;
-  final List<int>? relatedIds;
-  final int? wishListId;
-  final int? quantity;
-  final String? color;
-  final String? size;
-  final Pivot? pivot;
+      int? id;
+      String? name;
+      String? slug;
+      String? permalink;
+      String? dateCreated;
+      String? dateCreatedGmt;
+      String? dateModified;
+      String? dateModifiedGmt;
+      String? type;
+      String? status;
+      bool? featured;
+      String? catalogVisibility;
+      String? description;
+      String? shortDescription;
+      String? sku;
+      String? price;
+      String? regularPrice;
+      String? salePrice;
+      bool? onSale;
+      bool? purchasable;
+      String? totalSales;
+      bool? virtual;
+      bool? downloadable;
+      List<dynamic>? downloads;
+      int? downloadLimit;
+      int? downloadExpiry;
+      String? externalUrl;
+      String? buttonText;
+      String? taxStatus;
+      String? taxClass;
+      bool? manageStock;
+      int? stockQuantity;
+      String? backorders;
+      bool? backordersAllowed;
+      bool? backordered;
+      int? lowStockAmount;
+      bool? soldIndividually;
+      String? weight;
+      Map<String, String>? dimensions;
+      bool? shipping;
+      bool? shippingTaxable;
+      String? shippingClass;
+      int? shippingClassId;
+      bool? reviewsAllowed;
+      String? averageRating;
+      int? ratingCount;
+      List<int>? upsellIds;
+      List<int>? crossSellIds;
+      int? parentId;
+      String? purchaseNote;
+      List<Category>? categories;
+      List<dynamic>? tags;
+      List<ProductImage>? images;
+      List<Attribute>? attributes;
+      List<dynamic>? defaultAttributes;
+      List<dynamic>? variations;
+      List<int>? relatedIds;
+      int? wishListId;
+      int? quantity;
+      String? color;
+      String? size;
+      Pivot? pivot;
 
   Product({
     this.id,
@@ -218,42 +220,13 @@ class Product {
 
 // Apply similar null handling for ProductImage, Attribute, and Pivot classes
 
-class ProductImage {
-  final int? id;
-  final String? dateCreated;
-  final String? dateModified;
-  final String? src;
-  final String? name;
-  final String? alt;
-
-  ProductImage({
-    this.id,
-    this.dateCreated,
-    this.dateModified,
-    this.src,
-    this.name,
-    this.alt,
-  });
-
-  factory ProductImage.fromJson(Map<String, dynamic> json) {
-    return ProductImage(
-      id: json['id'] as int? ?? 0,
-      dateCreated: json['date_created'] as String? ?? '',
-      dateModified: json['date_modified'] as String? ?? '',
-      src: json['src'] as String? ?? '',
-      name: json['name'] as String? ?? '',
-      alt: json['alt'] as String? ?? '',
-    );
-  }
-}
-
 class Attribute {
-  final int? id;
-  final String? name;
-  final int? position;
-  final bool? visible;
-  final bool? variation;
-  final List<String>? options;
+      int? id;
+      String? name;
+      int? position;
+      bool? visible;
+      bool? variation;
+      List<String>? options;
 
   Attribute({
     this.id,
@@ -279,8 +252,8 @@ class Attribute {
 }
 
 class Pivot {
-  final int? productId;
-  final int? attributeId;
+      int? productId;
+      int? attributeId;
 
   Pivot({
     this.productId,

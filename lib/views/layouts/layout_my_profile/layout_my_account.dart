@@ -23,13 +23,12 @@ class _LayoutMyAccountState extends State<LayoutMyAccount> {
   @override
   void initState() {
     super.initState();
-    controller.fetchUserIdByToken();
-    log("user data ${controller.fetchUserIdByToken()}");
+    // controller.fetchUserIdByToken();
+    // log("user data ${controller.fetchUserIdByToken()}");
   }
   @override
   Widget build(BuildContext context) {
     AppStatusBar.light();
-
     return Scaffold(
       backgroundColor: AppColors.whiteColor,
       appBar: AppBar(
@@ -67,15 +66,18 @@ class _LayoutMyAccountState extends State<LayoutMyAccount> {
           child: Form(
             key: _formKey,
             child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 _buildSectionTitle("Your Details"),
-                _buildTextField(controller.firstName.value, "First Name"),
-                _buildTextField(controller.lastName.value, "Last Name"),
+                _buildTextField(controller.firstName.value, user?.firstName ?? "First Name"),
+                _buildTextField(controller.lastName.value, user?.lastName ?? "Last Name"),
+                _buildTextFieldEmail(controller.email.value, user?.email ?? "Email"),
                 _buildPhoneField(),
                 _buildSectionTitle("Main Address"),
-                _buildTextField(controller.country.value, "Country"),
-                _buildTextField(controller.city.value, "City"),
-                _buildTextField(controller.state.value, "State"),
+                _buildTextField(controller.country.value, user?.shipping!.country ?? "Country"),
+                _buildTextField(controller.city.value, user?.shipping!.city ?? "City"),
+                _buildTextField(controller.state.value, user?.shipping!.state ?? "State"),
                 _buildUpdateDetailsButton(),
               ],
             ),
@@ -96,7 +98,14 @@ class _LayoutMyAccountState extends State<LayoutMyAccount> {
     return MyAddressCostomTexttField(
       controller: controller,
       hint: hint,
-      validator: (value) => FormValidator.validateName(value), // Example validation
+      // validator: (value) => FormValidator.validateName(value), // Example validation
+    );
+  }
+  Widget _buildTextFieldEmail(TextEditingController controller, String hint) {
+    return MyAddressCostomTexttField(
+      controller: controller,
+      hint: hint,
+      validator: (value) => FormValidator.validateEmail(value), // Example validation
     );
   }
 
@@ -110,9 +119,14 @@ class _LayoutMyAccountState extends State<LayoutMyAccount> {
   Widget _buildUpdateDetailsButton() {
     return CustomButton(
       onTap: () async {
-        var userId = await controller.getUserId();
+        final userId = await controller.getUserId();
         if (_formKey.currentState!.validate()) {
-          controller.updateUserDetails("${userId}");
+          if (userId != null) {
+            controller.updateUserDetails(userId);
+            Get.back();
+          }else {
+            log("No User ID found in local storage.");
+          }
         }
       },
       text: "UPDATE DETAILS",

@@ -32,8 +32,10 @@ class LayoutHome extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final String demoImage = "https://picsum.photos/250";
-    controller.fetchCategories();
-    log("Categories = ${controller.categoryList.length}");
+    // controller.fetchCategories();
+    // log("Categories = ${controller.categoryList.length}");
+    // auth.fetchUserIdByToken();
+
     return Scaffold(
       body: SizedBox(
         height: Get.height,
@@ -66,7 +68,7 @@ class LayoutHome extends StatelessWidget {
                       InkWell(
                         onTap: () async {
                           Get.to(() => LayoutProfile());
-                         await auth.fetchUserIdByToken();
+                         await auth.fetchUserDetailsById();
                         },
                         child: CircleAvatar(
                           backgroundColor: Colors.white,

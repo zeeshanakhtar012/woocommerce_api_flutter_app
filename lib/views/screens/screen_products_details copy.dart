@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:zrj/model/product.dart';
 import '../../constants/colors.dart';
 import '../../constants/fonts.dart';
@@ -21,10 +22,12 @@ class ScreenProductDetails extends StatelessWidget {
         backgroundColor: AppColors.whiteColor,
         elevation: 0,
         leading: AppFontsStyle.buildBackButton(context),
+        centerTitle: true,
+        title: Text("${product.name}", style: AppFontsStyle.profileAppBar),
         // actions: [
         //   InkWell(
         //     onTap: () {
-        //       Get.to(() => ScreenFavouriteProduct());
+        //       // Get.to(() => ScreenFavouriteProduct());
         //     },
         //     child: Container(
         //       height: 37.h,

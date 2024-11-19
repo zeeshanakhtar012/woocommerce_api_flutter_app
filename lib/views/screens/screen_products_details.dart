@@ -1,17 +1,22 @@
+
 import 'dart:developer';
 
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
-import 'package:zrj/controllers/controller_payment.dart';
-import 'package:zrj/utils/firebase_utils.dart';
+
 import '../../constants/colors.dart';
+import '../../constants/fonts.dart';
 import '../../controllers/controller_authentication.dart';
+import '../../controllers/controller_cart.dart';
+import '../../controllers/controller_payment.dart';
 import '../../controllers/controller_product.dart';
+import '../../model/model_images.dart';
 import '../../model/product.dart';
 import '../../model/user.dart';
+import '../home/home_layouts/layout_cart.dart';
 
 class ScreenProductDetails extends StatefulWidget {
   final String productName;
@@ -43,7 +48,8 @@ class ScreenProductDetails extends StatefulWidget {
 class _ScreenProductDetailsState extends State<ScreenProductDetails> {
   final ProductWooCommerceController controller = Get.put(ProductWooCommerceController());
   PaymentsController paymentsController = Get.put(PaymentsController());
-  ControllerAuthentication authentication = Get.find();
+  ControllerAuthentication authentication = Get.put(ControllerAuthentication());
+  CartController cartController = Get.put(CartController());
   Color _selectedColor = Colors.red;
   String _selectedSize = 'S';
   int _quantity = 1;
@@ -60,7 +66,7 @@ class _ScreenProductDetailsState extends State<ScreenProductDetails> {
   @override
   void initState() {
     super.initState();
-    _fetchUsrDetails();
+    // _fetchUsrDetails();
   }
 
   void _increaseQuantity() {
@@ -77,13 +83,14 @@ class _ScreenProductDetailsState extends State<ScreenProductDetails> {
     }
   }
 
-  void _fetchUsrDetails() async {
+  void fetchUsrDetails() async {
+    final String userId = authentication.getUserId().toString();
     try {
-      if (widget.user != null && widget.user!.id != null) {
-        authentication.fetchUserDetailsById(widget.user!.id!);
+      if (userId != null && userId != null) {
+        authentication.fetchUserDetailsById();
         log("${widget.user!.id}");
       } else {
-        authentication.fetchUserIdByToken();
+        authentication.fetchUserDetailsById();
         log("${widget.user!.id}");
       }
     }catch(t){
@@ -93,7 +100,12 @@ class _ScreenProductDetailsState extends State<ScreenProductDetails> {
 
   @override
   Widget build(BuildContext context) {
-
+    log('Product Name: ${widget.productName}');
+    log('Product ID: ${widget.productId}');
+    log('Product Price: ${widget.productPrice}');
+    log('Product Images: ${widget.productImages}');
+    log('Product Description: ${widget.productDescription}');
+    fetchUsrDetails();
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -115,6 +127,8 @@ class _ScreenProductDetailsState extends State<ScreenProductDetails> {
         //     ),
         //   ),
         // ],
+        centerTitle: true,
+        title: Text("${widget.productName}", style: AppFontsStyle.profileAppBar),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -145,10 +159,10 @@ class _ScreenProductDetailsState extends State<ScreenProductDetails> {
       ),
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.all(8.0),
-        child:ElevatedButton(
+        child: ElevatedButton(
           onPressed: () async {
             if (widget.productId != null) {
-              // Initialize the product with null checks and default values
+              final String? userId = await authentication.getUserId();
               Product product = Product(
                 id: widget.productId!,
                 name: widget.productName ?? "N/A",
@@ -157,17 +171,12 @@ class _ScreenProductDetailsState extends State<ScreenProductDetails> {
                 size: (widget.sizes != null && widget.sizes!.isNotEmpty) ? widget.sizes![0] : "N/A",
                 images: widget.productImages != null
                     ? widget.productImages!.map((url) => ProductImage(src: url)).toList()
-                    : [], // Empty list if images are null
+                    : [],
                 color: (widget.colors != null && widget.colors!.isNotEmpty) ? widget.colors![0] : "N/A",
                 slug: widget.product?.slug ?? "default-slug",
                 permalink: widget.product?.permalink ?? "default-permalink",
-                // dateCreated: widget.product?.dateCreated ?? DateTime.now(),
-                // dateCreatedGmt: widget.product?.dateCreatedGmt ?? DateTime.now(),
-                // dateModified: widget.product?.dateModified ?? DateTime.now(),
-                // dateModifiedGmt: widget.product?.dateModifiedGmt ?? DateTime.now(),
               );
-              log("Product details /// $product");
-              // Initialize billing and shipping with null checks
+              log("Product details $product");
               Billing billing = Billing(
                 phone: widget.user?.billing?.phone ?? "N/A",
                 address2: widget.user?.billing?.address2 ?? "N/A",
@@ -183,10 +192,8 @@ class _ScreenProductDetailsState extends State<ScreenProductDetails> {
                 state: widget.user?.shipping?.state ?? "N/A",
                 country: widget.user?.shipping?.country ?? "N/A",
               );
-
-              // Initialize the user model with null checks
               UserModel user = UserModel(
-                id: widget.user?.id ?? 0,
+                id: userId,
                 firstName: widget.user?.firstName ?? "John",
                 lastName: widget.user?.lastName ?? "Doe",
                 email: widget.user?.email ?? "example@example.com",
@@ -195,7 +202,8 @@ class _ScreenProductDetailsState extends State<ScreenProductDetails> {
                 shipping: shipping,
                 isPayingCustomer: true,
               );
-              log("User data /// : $user");
+              log("User data : $user");
+              log("User Id : ${user.id}");
               // Call the payment controller
               paymentsController.makePayment(
                 getTotalPrice(),
@@ -214,7 +222,50 @@ class _ScreenProductDetailsState extends State<ScreenProductDetails> {
               print('Product ID is null');
             }
           },
-          child:  Text('Buy'),
+//           onPressed: () async {
+//             // Check for productId and the necessary fields
+//             if (widget.productId == null || widget.productPrice.isEmpty || widget.productName.isEmpty) {
+//               log("Product details are missing.");
+//               Get.snackbar(
+//                 snackPosition: SnackPosition.BOTTOM,
+//                 backgroundColor: Colors.red,
+//                 colorText: Colors.white,
+//                 duration: Duration(seconds: 2),
+//                 'Error', 'Product details are missing.',
+//               );
+//               return;
+//             }
+//
+//             // Create a list of ProductImage objects from widget.productImages (which is likely a list of image URLs)
+//             List<ProductImage> productImages = widget.productImages.isNotEmpty
+//                 ? widget.productImages.map((url) => ProductImage(src: url)).toList()  // Convert strings to ProductImage objects
+//                 : [];  // Empty list if no images
+//
+// // Create product with the images
+//             final product = Product(
+//               id: widget.productId ?? 0,
+//               name: widget.productName ?? 'Unknown Product',
+//               price: widget.productPrice ?? '0.0',
+//               quantity: _quantity,
+//               color: _selectedColor.toString(),
+//               size: _selectedSize,
+//               images: productImages,
+//             );
+//             // Add product to the cart
+//             cartController.addProductToCart(product);
+//
+//             // Show success message
+//             Get.snackbar(
+//               'Success',
+//               '${product.name} has been added to the cart!',
+//               snackPosition: SnackPosition.BOTTOM,
+//               backgroundColor: Colors.green,
+//               colorText: Colors.white,
+//               duration: Duration(seconds: 2),
+//             );
+//             log("Product added to cart successfully.");
+//           },
+          child: Text('Order Now', style: TextStyle(color: Colors.white, fontSize: 16.sp)),
           style: ElevatedButton.styleFrom(
             backgroundColor: AppColors.buttonColor,
             padding: EdgeInsets.symmetric(vertical: 15),

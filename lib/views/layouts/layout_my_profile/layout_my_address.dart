@@ -14,7 +14,7 @@ class LayoutAddress extends StatelessWidget {
   final ControllerAuthentication controller = Get.put(ControllerAuthentication());
 
   Future<String?> getUserId() async {
-    final int? userId = await controller.getUserId();
+    final String? userId = await controller.getUserId();
     return userId?.toString();
   }
 
